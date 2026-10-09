@@ -1,5 +1,7 @@
 import unittest
 
+import numpy as np
+
 from ok.feature.Box import Box
 from src.task.EnhanceEchoTask import EnhanceEchoTask
 
@@ -12,13 +14,28 @@ class FakeEnhanceTask:
     larger than the search area crashes cv2.matchTemplate (#1238, #1291).
     """
 
+    _echo_status_feature_box = EnhanceEchoTask._echo_status_feature_box
+    _echo_inventory_capture_y_offset = staticmethod(
+        EnhanceEchoTask._echo_inventory_capture_y_offset
+    )
+
     def __init__(self, boxes, match_name):
-        self.boxes = boxes
+        self.boxes = {
+            'echo_dropped': Box(534, 152, 28, 26),
+            'echo_not_dropped': Box(534, 151, 28, 29),
+            'echo_locked': Box(631, 152, 23, 26),
+            'echo_not_locked': Box(631, 151, 24, 29),
+            **boxes,
+        }
+        self.frame = np.zeros((768, 1366, 3), dtype=np.uint8)
         self.match_name = match_name
         self.search_calls = []
         self.fail_reason = ''
         self.config = {}
         self.counters = {}
+
+    def next_frame(self):
+        pass
 
     def get_box_by_name(self, name):
         return self.boxes[name]

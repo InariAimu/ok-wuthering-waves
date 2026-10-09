@@ -1,0 +1,118 @@
+{
+  "kind": "ok-ww.echo-character-templates",
+  "schema_version": 1,
+  "description": "GUI第一步检查使用的角色模板。可复制角色节点并修改套装、当前五件、副词条、候选名称和模型策略。",
+  "characters": {
+    "秧秧·玄翎": {
+      "sonata_set": "羽落空尘之歌",
+      "profile_name": "xuanling_ui_template",
+      "main_stats": {
+        "4": "crit_damage",
+        "3": "havoc_damage",
+        "1": "attack_percent"
+      },
+      "weights": {
+        "crit_rate": 1.8,
+        "crit_damage": 0.9,
+        "attack_percent": 0.9,
+        "defense_percent": 0.0,
+        "hp_percent": 0.0,
+        "attack_flat": 0.1,
+        "defense_flat": 0.0,
+        "hp_flat": 0.0,
+        "energy_regen": 0.5,
+        "basic_attack_damage": 0.0,
+        "heavy_attack_damage": 0.675,
+        "resonance_skill_damage": 0.0,
+        "resonance_liberation_damage": 0.0
+      },
+      "energy_policy": {
+        "required": 130.0,
+        "comfort": 135.0,
+        "overflow": 145.0,
+        "base": 100.0,
+        "tolerance_weight_ratio": 0.5555555555555556
+      },
+      "base_panel": {
+        "energy_regen": 110.0
+      },
+      "equipped_echoes": [
+        {
+          "slot": "4C",
+          "name": "千傀重楼",
+          "cost": 4,
+          "rolls": [
+            {"stat": "crit_rate", "value": 6.9},
+            {"stat": "crit_damage", "value": 15.0},
+            {"stat": "hp_percent", "value": 8.6},
+            {"stat": "defense_flat", "value": 50},
+            {"stat": "attack_percent", "value": 9.4}
+          ]
+        },
+        {
+          "slot": "3C-1",
+          "name": "霁息兽尊",
+          "cost": 3,
+          "rolls": [
+            {"stat": "energy_regen", "value": 8.4},
+            {"stat": "attack_flat", "value": 40},
+            {"stat": "crit_rate", "value": 8.1},
+            {"stat": "resonance_liberation_damage", "value": 6.4},
+            {"stat": "crit_damage", "value": 17.4}
+          ]
+        },
+        {
+          "slot": "3C-2",
+          "name": "封庭械囿",
+          "cost": 3,
+          "rolls": [
+            {"stat": "heavy_attack_damage", "value": 6.4},
+            {"stat": "crit_rate", "value": 6.3},
+            {"stat": "energy_regen", "value": 9.2},
+            {"stat": "crit_damage", "value": 13.8},
+            {"stat": "resonance_liberation_damage", "value": 10.1}
+          ]
+        },
+        {
+          "slot": "1C-1",
+          "name": "不熄猎手",
+          "cost": 1,
+          "rolls": [
+            {"stat": "basic_attack_damage", "value": 8.6},
+            {"stat": "crit_damage", "value": 12.6},
+            {"stat": "resonance_liberation_damage", "value": 9.4},
+            {"stat": "heavy_attack_damage", "value": 9.4},
+            {"stat": "crit_rate", "value": 8.7}
+          ]
+        },
+        {
+          "slot": "1C-2",
+          "name": "霁息兽尊·身",
+          "cost": 1,
+          "rolls": [
+            {"stat": "crit_damage", "value": 13.8},
+            {"stat": "crit_rate", "value": 7.5},
+            {"stat": "resonance_liberation_damage", "value": 11.6},
+            {"stat": "energy_regen", "value": 10.0},
+            {"stat": "basic_attack_damage", "value": 8.6}
+          ]
+        }
+      ],
+      "candidate_names": {
+        "4": ["千傀重楼"],
+        "3": ["霁息兽尊", "封庭械囿"],
+        "1": ["不熄猎手", "融躯战士", "霁息兽尊·首", "霁息兽尊·身"]
+      },
+      "policy": {
+        "rollout_samples": 2000,
+        "minimum_gain": 0.0,
+        "continuation_efficiency_ratio": 0.9,
+        "max_attempts": 2000,
+        "analysis_seed": 15100,
+        "outcome_seed": 151,
+        "required_stats": [],
+        "deferred_recycling": false
+      }
+    }
+  }
+}

@@ -1168,8 +1168,8 @@ msgid "Merge Discarded Echoes"
 msgstr "融合已弃置声骸"
 
 msgid ""
-"Must have 1000 discarded Echo to Run, Merge discarded Echoes in full "
-"batches of 100."
+"Must have 1000 discarded Echo to Run, Merge discarded Echoes in full batches"
+" of 100."
 msgstr "运行前必须有1000个已弃置声骸，每批融合100个。"
 
 msgid "Bag Key"
@@ -1196,13 +1196,18 @@ msgstr "已弃置声骸超过1000时融合"
 msgid "Additional Tasks to Run After Daily Task"
 msgstr "每日任务后运行的附加任务"
 
-msgid "Select optional tasks. Nightmare Nest runs before stamina farming to help complete the daily task; the other tasks run afterward."
+msgid ""
+"Select optional tasks. Nightmare Nest runs before stamina farming to help "
+"complete the daily task; the other tasks run afterward."
 msgstr "选择可选任务。梦魇巢穴会在消耗体力前运行，以协助完成每日任务；其他任务将在之后运行。"
 
-msgid "Teleport and Farm 4C Echo requires \"Teleport to Boss\" to be enabled in Farm Echo Task."
+msgid ""
+"Teleport and Farm 4C Echo requires \"Teleport to Boss\" to be enabled in "
+"Farm Echo Task."
 msgstr "选择“传送并刷取4C声骸”时，必须在刷取声骸任务中启用“传送至首领”。"
 
-msgid "Auto Farm all Nightmare Nest requires at least one \"Which to Farm\" option."
+msgid ""
+"Auto Farm all Nightmare Nest requires at least one \"Which to Farm\" option."
 msgstr "选择“自动刷取所有梦魇巢穴”时，“刷取目标”必须至少选择一项。"
 
 msgid "Daily Task Completed"
@@ -1447,3 +1452,238 @@ msgstr "特异梦魇"
 
 msgid "Which Special Nightmare to Teleport"
 msgstr "传送到第几个特异梦魇"
+
+msgid "Resource Source"
+msgstr "资源来源"
+
+msgid "OK-WW or Manual"
+msgstr "优先由 OK-WW 获取，失败时手动输入"
+
+msgid "Manual"
+msgstr "手动输入"
+
+msgid "Manual Tuners"
+msgstr "手动输入调谐器数量"
+
+msgid "Manual Premium Echo EXP Tubes"
+msgstr "手动输入特级密音筒数量"
+
+msgid "Manual Echo EXP"
+msgstr "手动输入额外声骸经验"
+
+msgid "Enforce Resource Budget"
+msgstr "启用资源数量约束"
+
+msgid ""
+"Prefer resources read by an injected OK-WW provider, or use manual values"
+msgstr "优先使用 OK-WW 资源读取接口；不可用时采用手动输入值"
+
+msgid "Fallback number of tuners available to this run"
+msgstr "本轮可用的调谐器数量（读取失败时使用）"
+
+msgid "Fallback EXP inventory in 5000-EXP tube equivalents"
+msgstr "本轮可用的特级密音筒数量，每个折合 5000 经验（读取失败时使用）"
+
+msgid "Additional raw Echo EXP available to this run"
+msgstr "本轮可用的额外声骸经验"
+
+msgid "Stop before an upgrade that exceeds the configured resources"
+msgstr "下一次强化超出配置资源时停止；当前声骸不会被标记弃置"
+
+msgid "Template File"
+msgstr "角色模板文件"
+
+msgid "Character Template"
+msgstr "角色模板"
+
+msgid "4C Main Stat"
+msgstr "4C 主属性"
+
+msgid "3C Main Stat"
+msgstr "3C 主属性"
+
+msgid "1C Main Stat"
+msgstr "1C 主属性"
+
+msgid "Weight Crit Rate"
+msgstr "权重：暴击"
+
+msgid "Weight Crit Damage"
+msgstr "权重：暴击伤害"
+
+msgid "Weight Attack %"
+msgstr "权重：攻击%"
+
+msgid "Weight Defense %"
+msgstr "权重：防御%"
+
+msgid "Weight HP %"
+msgstr "权重：生命%"
+
+msgid "Weight Flat Attack"
+msgstr "权重：固定攻击"
+
+msgid "Weight Flat Defense"
+msgstr "权重：固定防御"
+
+msgid "Weight Flat HP"
+msgstr "权重：固定生命"
+
+msgid "Weight Energy Regen"
+msgstr "权重：共鸣效率"
+
+msgid "Weight Basic Attack"
+msgstr "权重：普攻伤害"
+
+msgid "Weight Heavy Attack"
+msgstr "权重：重击伤害"
+
+msgid "Weight Resonance Skill"
+msgstr "权重：共鸣技能伤害"
+
+msgid "Weight Resonance Liberation"
+msgstr "权重：共鸣解放伤害"
+
+msgid "Output Directory"
+msgstr "输出目录"
+
+msgid "COSTs"
+msgstr "COST 分页"
+
+msgid "Max Pages Per COST"
+msgstr "每个 COST 最大页数"
+
+msgid "Scroll Count"
+msgstr "滚动格数"
+
+msgid "Settle Seconds"
+msgstr "操作等待秒数"
+
+msgid "Crit Rate"
+msgstr "暴击"
+
+msgid "Crit Damage"
+msgstr "暴击伤害"
+
+msgid "Attack %"
+msgstr "攻击%"
+
+msgid "Defense %"
+msgstr "防御%"
+
+msgid "HP %"
+msgstr "生命%"
+
+msgid "Healing Bonus"
+msgstr "治疗效果"
+
+msgid "Glacio DMG Bonus"
+msgstr "冷凝伤害"
+
+msgid "Fusion DMG Bonus"
+msgstr "热熔伤害"
+
+msgid "Electro DMG Bonus"
+msgstr "导电伤害"
+
+msgid "Aero DMG Bonus"
+msgstr "气动伤害"
+
+msgid "Spectro DMG Bonus"
+msgstr "衍射伤害"
+
+msgid "Havoc DMG Bonus"
+msgstr "湮灭伤害"
+
+msgid "Energy Regen"
+msgstr "共鸣效率"
+
+msgid "① 检查套装与声骸（不强化）"
+msgstr "① 检查套装与声骸（不强化）"
+
+msgid "严格选择并读回角色对应合鸣套装，设置等级从高到低后扫描满级声骸；只生成供用户检查的结果文件，不进入培养。"
+msgstr "严格选择并读回角色对应合鸣套装，设置等级从高到低后扫描满级声骸；只生成供用户检查的结果文件，不进入培养。"
+
+msgid "角色默认模板 JSON；相对路径按 OK-WW 项目根目录解析"
+msgstr "角色默认模板 JSON；相对路径按 OK-WW 项目根目录解析"
+
+msgid "选择角色及其套装、当前五件、候选声骸和模型策略"
+msgstr "选择角色及其套装、当前五件、候选声骸和模型策略"
+
+msgid "本次检查接受的 4C 主属性"
+msgstr "本次检查接受的 4C 主属性"
+
+msgid "本次检查接受的 3C 主属性"
+msgstr "本次检查接受的 3C 主属性"
+
+msgid "本次检查接受的 1C 主属性"
+msgstr "本次检查接受的 1C 主属性"
+
+msgid "检查结果根目录；每次运行会创建独立时间目录"
+msgstr "检查结果根目录；每次运行会创建独立时间目录"
+
+msgid "要检查的 COST 页签"
+msgstr "要检查的 COST 页签"
+
+msgid "每个 COST 的安全页数上限"
+msgstr "每个 COST 的安全页数上限"
+
+msgid "每次向下滚动的格数"
+msgstr "每次向下滚动的格数"
+
+msgid "切换、点击或滚动后的等待秒数"
+msgstr "切换、点击或滚动后的等待秒数"
+
+msgid "暴击副属性每一点的模型权重"
+msgstr "暴击副属性每一点的模型权重"
+
+msgid "暴击伤害副属性每一点的模型权重"
+msgstr "暴击伤害副属性每一点的模型权重"
+
+msgid "百分比攻击副属性每一点的模型权重"
+msgstr "百分比攻击副属性每一点的模型权重"
+
+msgid "百分比防御副属性每一点的模型权重"
+msgstr "百分比防御副属性每一点的模型权重"
+
+msgid "百分比生命副属性每一点的模型权重"
+msgstr "百分比生命副属性每一点的模型权重"
+
+msgid "固定攻击副属性每一点的模型权重"
+msgstr "固定攻击副属性每一点的模型权重"
+
+msgid "固定防御副属性每一点的模型权重"
+msgstr "固定防御副属性每一点的模型权重"
+
+msgid "固定生命副属性每一点的模型权重"
+msgstr "固定生命副属性每一点的模型权重"
+
+msgid "共鸣效率副属性每一点的模型权重"
+msgstr "共鸣效率副属性每一点的模型权重"
+
+msgid "普攻伤害副属性每一点的模型权重"
+msgstr "普攻伤害副属性每一点的模型权重"
+
+msgid "重击伤害副属性每一点的模型权重"
+msgstr "重击伤害副属性每一点的模型权重"
+
+msgid "共鸣技能伤害副属性每一点的模型权重"
+msgstr "共鸣技能伤害副属性每一点的模型权重"
+
+msgid "共鸣解放伤害副属性每一点的模型权重"
+msgstr "共鸣解放伤害副属性每一点的模型权重"
+
+msgid "echo_character_templates.json"
+msgstr "echo_character_templates.json"
+
+msgid "artifacts/echo_inventory/checks"
+msgstr "artifacts/echo_inventory/checks"
+
+msgid "1"
+msgstr "1"
+
+msgid "3"
+msgstr "3"
+
+msgid "4"
+msgstr "4"

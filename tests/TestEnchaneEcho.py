@@ -27,6 +27,15 @@ class TestEnchaneEcho(TaskTestCase):
         find_confirm = self.task.find_confirm()
         self.assertEqual(len(find_confirm), 1)
 
+    def test_reads_fresh_candidate_identity_from_details(self):
+        self.set_image('tests/images/echo_enhance.png')
+
+        identity = self.task._read_current_echo_candidate_identity()
+
+        self.assertEqual(identity.name, '影烁者')
+        self.assertEqual(identity.cost, 1)
+        self.assertEqual(identity.compatibility, 'cost_1:attack_percent')
+
 
 if __name__ == '__main__':
     unittest.main()

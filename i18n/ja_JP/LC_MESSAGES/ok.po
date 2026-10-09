@@ -1116,8 +1116,8 @@ msgid "Merge Discarded Echoes"
 msgstr "破棄済み音骸を融合"
 
 msgid ""
-"Must have 1000 discarded Echo to Run, Merge discarded Echoes in full "
-"batches of 100."
+"Must have 1000 discarded Echo to Run, Merge discarded Echoes in full batches"
+" of 100."
 msgstr "実行には破棄済み音骸が1000個必要です。破棄済み音骸を100個単位で融合します。"
 
 msgid "Bag Key"
@@ -1144,13 +1144,18 @@ msgstr "破棄済み音骸が1000個超なら融合"
 msgid "Additional Tasks to Run After Daily Task"
 msgstr "デイリータスク後に実行する追加タスク"
 
-msgid "Select optional tasks. Nightmare Nest runs before stamina farming to help complete the daily task; the other tasks run afterward."
+msgid ""
+"Select optional tasks. Nightmare Nest runs before stamina farming to help "
+"complete the daily task; the other tasks run afterward."
 msgstr "任意のタスクを選択します。悪夢の巣はデイリー達成を補助するためスタミナ消費前に実行し、その他のタスクはその後に実行します。"
 
-msgid "Teleport and Farm 4C Echo requires \"Teleport to Boss\" to be enabled in Farm Echo Task."
+msgid ""
+"Teleport and Farm 4C Echo requires \"Teleport to Boss\" to be enabled in "
+"Farm Echo Task."
 msgstr "「テレポートしてコスト4音骸を収集」を実行するには、音骸収集タスクの「ボスへテレポート」を有効にしてください。"
 
-msgid "Auto Farm all Nightmare Nest requires at least one \"Which to Farm\" option."
+msgid ""
+"Auto Farm all Nightmare Nest requires at least one \"Which to Farm\" option."
 msgstr "「すべての悪夢の巣を自動周回」を実行するには、「周回対象」を1つ以上選択してください。"
 
 msgid "Daily Task Completed"
@@ -1232,7 +1237,8 @@ msgid "点击B进入背包, 在过滤器中选择需要强化的声骸, 并按�
 msgstr "Bキーでバッグを開き、フィルターで強化する音骸を選択し、レベル0から昇順に並べて開始してください。"
 
 msgid "游戏与okww语言必须为简体/繁体中文,必须16:9分辨率,使用1600x900以上分辨率, 勾选需要的, 没勾的都会自动合成"
-msgstr "ゲームとokwwの言語は簡体字/繁体字中国語、解像度は16:9かつ1600x900以上が必要です。必要なものにチェックを入れると、未チェックのものは自動合成されます。"
+msgstr ""
+"ゲームとokwwの言語は簡体字/繁体字中国語、解像度は16:9かつ1600x900以上が必要です。必要なものにチェックを入れると、未チェックのものは自動合成されます。"
 
 msgid "Switch to Healer before and after Combat"
 msgstr "戦闘前後にヒーラーへ切り替える"
@@ -1395,3 +1401,238 @@ msgstr "特異悪夢"
 
 msgid "Which Special Nightmare to Teleport"
 msgstr "テレポートする特異悪夢"
+
+msgid "Resource Source"
+msgstr "リソース取得元"
+
+msgid "OK-WW or Manual"
+msgstr "OK-WW優先（失敗時は手動入力）"
+
+msgid "Manual"
+msgstr "手動入力"
+
+msgid "Manual Tuners"
+msgstr "チュナの手動入力数"
+
+msgid "Manual Premium Echo EXP Tubes"
+msgstr "高級レコードセットの手動入力数"
+
+msgid "Manual Echo EXP"
+msgstr "追加音骸EXPの手動入力値"
+
+msgid "Enforce Resource Budget"
+msgstr "リソース上限を適用"
+
+msgid ""
+"Prefer resources read by an injected OK-WW provider, or use manual values"
+msgstr "OK-WWから取得したリソースを優先し、利用できない場合は手動入力値を使用します"
+
+msgid "Fallback number of tuners available to this run"
+msgstr "取得失敗時にこの実行で使用できるチュナ数"
+
+msgid "Fallback EXP inventory in 5000-EXP tube equivalents"
+msgstr "取得失敗時に使用する、1個5000 EXP換算の高級レコードセット数"
+
+msgid "Additional raw Echo EXP available to this run"
+msgstr "この実行で使用できる追加音骸EXP"
+
+msgid "Stop before an upgrade that exceeds the configured resources"
+msgstr "設定リソースを超える強化の前に停止し、現在の音骸には破棄印を付けません"
+
+msgid "Template File"
+msgstr "キャラクターテンプレート"
+
+msgid "Character Template"
+msgstr "キャラクターテンプレート"
+
+msgid "4C Main Stat"
+msgstr "4Cメインステータス"
+
+msgid "3C Main Stat"
+msgstr "3Cメインステータス"
+
+msgid "1C Main Stat"
+msgstr "1Cメインステータス"
+
+msgid "Weight Crit Rate"
+msgstr "重み：クリティカル率"
+
+msgid "Weight Crit Damage"
+msgstr "重み：クリティカルダメージ"
+
+msgid "Weight Attack %"
+msgstr "重み：攻撃%"
+
+msgid "Weight Defense %"
+msgstr "重み：防御%"
+
+msgid "Weight HP %"
+msgstr "重み：HP%"
+
+msgid "Weight Flat Attack"
+msgstr "重み：固定攻撃力"
+
+msgid "Weight Flat Defense"
+msgstr "重み：固定防御力"
+
+msgid "Weight Flat HP"
+msgstr "重み：固定HP"
+
+msgid "Weight Energy Regen"
+msgstr "重み：共鳴効率"
+
+msgid "Weight Basic Attack"
+msgstr "重み：通常攻撃ダメージ"
+
+msgid "Weight Heavy Attack"
+msgstr "重み：重撃ダメージ"
+
+msgid "Weight Resonance Skill"
+msgstr "重み：共鳴スキルダメージ"
+
+msgid "Weight Resonance Liberation"
+msgstr "重み：共鳴解放ダメージ"
+
+msgid "Output Directory"
+msgstr "出力ディレクトリ"
+
+msgid "COSTs"
+msgstr "COSTタブ"
+
+msgid "Max Pages Per COST"
+msgstr "COSTごとの最大ページ数"
+
+msgid "Scroll Count"
+msgstr "スクロール数"
+
+msgid "Settle Seconds"
+msgstr "操作後の待機秒数"
+
+msgid "Crit Rate"
+msgstr "クリティカル率"
+
+msgid "Crit Damage"
+msgstr "クリティカルダメージ"
+
+msgid "Attack %"
+msgstr "攻撃%"
+
+msgid "Defense %"
+msgstr "防御%"
+
+msgid "HP %"
+msgstr "HP%"
+
+msgid "Healing Bonus"
+msgstr "回復効果"
+
+msgid "Glacio DMG Bonus"
+msgstr "凝縮ダメージ"
+
+msgid "Fusion DMG Bonus"
+msgstr "焦熱ダメージ"
+
+msgid "Electro DMG Bonus"
+msgstr "電導ダメージ"
+
+msgid "Aero DMG Bonus"
+msgstr "気動ダメージ"
+
+msgid "Spectro DMG Bonus"
+msgstr "回折ダメージ"
+
+msgid "Havoc DMG Bonus"
+msgstr "消滅ダメージ"
+
+msgid "Energy Regen"
+msgstr "共鳴効率"
+
+msgid "角色默认模板 JSON；相对路径按 OK-WW 项目根目录解析"
+msgstr "デフォルトのキャラクターテンプレートJSON。相対パスはOK-WWプロジェクトルート基準"
+
+msgid "选择角色及其套装、当前五件、候选声骸和模型策略"
+msgstr "キャラクター、ハーモニーセット、現在の5体、候補、モデル方針を選択"
+
+msgid "本次检查接受的 4C 主属性"
+msgstr "今回の検査で受け付ける4Cメインステータス"
+
+msgid "本次检查接受的 3C 主属性"
+msgstr "今回の検査で受け付ける3Cメインステータス"
+
+msgid "本次检查接受的 1C 主属性"
+msgstr "今回の検査で受け付ける1Cメインステータス"
+
+msgid "检查结果根目录；每次运行会创建独立时间目录"
+msgstr "検査結果のルート。実行ごとに時刻別ディレクトリを作成"
+
+msgid "要检查的 COST 页签"
+msgstr "検査するCOSTタブ"
+
+msgid "每个 COST 的安全页数上限"
+msgstr "COSTごとの安全ページ上限"
+
+msgid "每次向下滚动的格数"
+msgstr "1回に下へスクロールするマス数"
+
+msgid "切换、点击或滚动后的等待秒数"
+msgstr "切替・クリック・スクロール後の待機秒数"
+
+msgid "① 检查套装与声骸（不强化）"
+msgstr "① セットと音骸を検査（強化なし）"
+
+msgid "严格选择并读回角色对应合鸣套装，设置等级从高到低后扫描满级声骸；只生成供用户检查的结果文件，不进入培养。"
+msgstr "キャラクターのハーモニーセットを選択・確認し、レベル降順で最大強化の音骸をスキャンします。確認用ファイルのみ生成し、強化は行いません。"
+
+msgid "暴击副属性每一点的模型权重"
+msgstr "クリティカル率サブステータス1ポイントあたりのモデル重み"
+
+msgid "暴击伤害副属性每一点的模型权重"
+msgstr "クリティカルダメージサブステータス1ポイントあたりのモデル重み"
+
+msgid "百分比攻击副属性每一点的模型权重"
+msgstr "攻撃%サブステータス1ポイントあたりのモデル重み"
+
+msgid "百分比防御副属性每一点的模型权重"
+msgstr "防御%サブステータス1ポイントあたりのモデル重み"
+
+msgid "百分比生命副属性每一点的模型权重"
+msgstr "HP%サブステータス1ポイントあたりのモデル重み"
+
+msgid "固定攻击副属性每一点的模型权重"
+msgstr "固定攻撃力サブステータス1ポイントあたりのモデル重み"
+
+msgid "固定防御副属性每一点的模型权重"
+msgstr "固定防御力サブステータス1ポイントあたりのモデル重み"
+
+msgid "固定生命副属性每一点的模型权重"
+msgstr "固定HPサブステータス1ポイントあたりのモデル重み"
+
+msgid "共鸣效率副属性每一点的模型权重"
+msgstr "共鳴効率サブステータス1ポイントあたりのモデル重み"
+
+msgid "普攻伤害副属性每一点的模型权重"
+msgstr "通常攻撃ダメージサブステータス1ポイントあたりのモデル重み"
+
+msgid "重击伤害副属性每一点的模型权重"
+msgstr "重撃ダメージサブステータス1ポイントあたりのモデル重み"
+
+msgid "共鸣技能伤害副属性每一点的模型权重"
+msgstr "共鳴スキルダメージサブステータス1ポイントあたりのモデル重み"
+
+msgid "共鸣解放伤害副属性每一点的模型权重"
+msgstr "共鳴解放ダメージサブステータス1ポイントあたりのモデル重み"
+
+msgid "echo_character_templates.json"
+msgstr "echo_character_templates.json"
+
+msgid "artifacts/echo_inventory/checks"
+msgstr "artifacts/echo_inventory/checks"
+
+msgid "1"
+msgstr "1"
+
+msgid "3"
+msgstr "3"
+
+msgid "4"
+msgstr "4"

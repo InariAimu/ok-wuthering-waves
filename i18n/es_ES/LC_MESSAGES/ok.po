@@ -1041,8 +1041,8 @@ msgid "Merge Discarded Echoes"
 msgstr "Fusionar ecos descartados"
 
 msgid ""
-"Must have 1000 discarded Echo to Run, Merge discarded Echoes in full "
-"batches of 100."
+"Must have 1000 discarded Echo to Run, Merge discarded Echoes in full batches"
+" of 100."
 msgstr ""
 "Debe haber 1000 ecos descartados para ejecutarse. Fusiona ecos descartados "
 "en lotes completos de 100."
@@ -1060,7 +1060,9 @@ msgid "Check Discarded Echo"
 msgstr "Comprobar ecos descartados"
 
 msgid "After daily tasks, check for 1000 discarded Echoes and merge them."
-msgstr "Después de las tareas diarias, comprueba si hay 1000 ecos descartados y fusiónalos."
+msgstr ""
+"Después de las tareas diarias, comprueba si hay 1000 ecos descartados y "
+"fusiónalos."
 
 msgid "Teleport and Farm 4C Echo"
 msgstr "Teletransportarse y farmear eco de coste 4"
@@ -1071,20 +1073,34 @@ msgstr "Fusionar ecos si hay más de 1000 descartados"
 msgid "Additional Tasks to Run After Daily Task"
 msgstr "Tareas adicionales para ejecutar después de la tarea diaria"
 
-msgid "Select optional tasks. Nightmare Nest runs before stamina farming to help complete the daily task; the other tasks run afterward."
-msgstr "Selecciona tareas opcionales. Nido de pesadilla se ejecuta antes de gastar energía para ayudar a completar la tarea diaria; las demás se ejecutan después."
+msgid ""
+"Select optional tasks. Nightmare Nest runs before stamina farming to help "
+"complete the daily task; the other tasks run afterward."
+msgstr ""
+"Selecciona tareas opcionales. Nido de pesadilla se ejecuta antes de gastar "
+"energía para ayudar a completar la tarea diaria; las demás se ejecutan "
+"después."
 
-msgid "Teleport and Farm 4C Echo requires \"Teleport to Boss\" to be enabled in Farm Echo Task."
-msgstr "Teletransportarse y farmear eco de coste 4 requiere activar \"Teletransportarse al jefe\" en la tarea de farmeo de ecos."
+msgid ""
+"Teleport and Farm 4C Echo requires \"Teleport to Boss\" to be enabled in "
+"Farm Echo Task."
+msgstr ""
+"Teletransportarse y farmear eco de coste 4 requiere activar "
+"\"Teletransportarse al jefe\" en la tarea de farmeo de ecos."
 
-msgid "Auto Farm all Nightmare Nest requires at least one \"Which to Farm\" option."
-msgstr "Farmear automáticamente todos los nidos de pesadilla requiere seleccionar al menos una opción en \"Qué farmear\"."
+msgid ""
+"Auto Farm all Nightmare Nest requires at least one \"Which to Farm\" option."
+msgstr ""
+"Farmear automáticamente todos los nidos de pesadilla requiere seleccionar al"
+" menos una opción en \"Qué farmear\"."
 
 msgid "Daily Task Completed"
 msgstr "Tarea diaria completada"
 
 msgid "Daily task completed, start teleport to farm 4C echo"
-msgstr "Tarea diaria completada; iniciando teletransporte para farmear ecos de coste 4"
+msgstr ""
+"Tarea diaria completada; iniciando teletransporte para farmear ecos de coste"
+" 4"
 
 msgid "can't find dialog right button"
 msgstr "No se puede encontrar el botón derecho del diálogo"
@@ -1102,7 +1118,9 @@ msgid "🌸 Auto Pick"
 msgstr "🌸 Recolección automática"
 
 msgid "🎛️ 批量修改声骸主属性(仅支持简中游戏语言)"
-msgstr "🎛️ Modificar atributos principales de Ecos por lotes (solo chino simplificado)"
+msgstr ""
+"🎛️ Modificar atributos principales de Ecos por lotes (solo chino "
+"simplificado)"
 
 msgid "📅 Daily Task"
 msgstr "📅 Tarea diaria"
@@ -1111,7 +1129,9 @@ msgid "🩺 Diagnosis"
 msgstr "🩺 Diagnóstico"
 
 msgid "⬆️ 批量强化声骸(游戏与okww语言必须为简体/繁体中文)"
-msgstr "⬆️ Mejorar Ecos por lotes (el juego y okww deben usar chino simplificado/tradicional)"
+msgstr ""
+"⬆️ Mejorar Ecos por lotes (el juego y okww deben usar chino "
+"simplificado/tradicional)"
 
 msgid "🌀 Farm 4C Echo in Dungeon/World"
 msgstr "🌀 Farmear Eco 4C en mazmorra/mundo"
@@ -1153,13 +1173,21 @@ msgid "🌊 Tacet Suppression"
 msgstr "🌊 Supresión Tacet"
 
 msgid "点击B进入背包, 在过滤器中选择需要修改主属性的声骸, 并按照等级从0排序后开始."
-msgstr "Pulsa B para abrir la mochila, selecciona en el filtro los Ecos cuyo atributo principal quieras modificar y ordénalos por nivel desde 0 antes de comenzar."
+msgstr ""
+"Pulsa B para abrir la mochila, selecciona en el filtro los Ecos cuyo "
+"atributo principal quieras modificar y ordénalos por nivel desde 0 antes de "
+"comenzar."
 
 msgid "点击B进入背包, 在过滤器中选择需要强化的声骸, 并按照等级从0排序后开始."
-msgstr "Pulsa B para abrir la mochila, selecciona en el filtro los Ecos que quieras mejorar y ordénalos por nivel desde 0 antes de comenzar."
+msgstr ""
+"Pulsa B para abrir la mochila, selecciona en el filtro los Ecos que quieras "
+"mejorar y ordénalos por nivel desde 0 antes de comenzar."
 
 msgid "游戏与okww语言必须为简体/繁体中文,必须16:9分辨率,使用1600x900以上分辨率, 勾选需要的, 没勾的都会自动合成"
-msgstr "El juego y okww deben estar en chino simplificado/tradicional; se requiere una resolución 16:9 de al menos 1600x900. Marca lo que quieras conservar; lo no marcado se fusionará automáticamente."
+msgstr ""
+"El juego y okww deben estar en chino simplificado/tradicional; se requiere "
+"una resolución 16:9 de al menos 1600x900. Marca lo que quieras conservar; lo"
+" no marcado se fusionará automáticamente."
 
 msgid "Switch to Healer before and after Combat"
 msgstr "Cambiar al sanador antes y después del combate"
@@ -1322,3 +1350,249 @@ msgstr "Pesadilla especial"
 
 msgid "Which Special Nightmare to Teleport"
 msgstr "Pesadilla especial a la que teletransportar"
+
+msgid "Resource Source"
+msgstr "Origen de recursos"
+
+msgid "OK-WW or Manual"
+msgstr "Preferir OK-WW; manual si falla"
+
+msgid "Manual"
+msgstr "Manual"
+
+msgid "Manual Tuners"
+msgstr "Afinadores introducidos manualmente"
+
+msgid "Manual Premium Echo EXP Tubes"
+msgstr "Tubos de EXP de Eco prémium introducidos manualmente"
+
+msgid "Manual Echo EXP"
+msgstr "EXP de Eco adicional introducida manualmente"
+
+msgid "Enforce Resource Budget"
+msgstr "Aplicar límite de recursos"
+
+msgid ""
+"Prefer resources read by an injected OK-WW provider, or use manual values"
+msgstr ""
+"Prioriza los recursos obtenidos por OK-WW; si no están disponibles, usa los "
+"valores manuales"
+
+msgid "Fallback number of tuners available to this run"
+msgstr "Afinadores disponibles para esta ejecución si falla la lectura"
+
+msgid "Fallback EXP inventory in 5000-EXP tube equivalents"
+msgstr "Tubos prémium equivalentes a 5000 EXP disponibles si falla la lectura"
+
+msgid "Additional raw Echo EXP available to this run"
+msgstr "EXP de Eco adicional disponible para esta ejecución"
+
+msgid "Stop before an upgrade that exceeds the configured resources"
+msgstr ""
+"Detiene la tarea antes de superar los recursos; no marca el Eco actual para "
+"descarte"
+
+msgid "Template File"
+msgstr "Archivo de plantilla"
+
+msgid "Character Template"
+msgstr "Plantilla de personaje"
+
+msgid "4C Main Stat"
+msgstr "Estadística principal 4C"
+
+msgid "3C Main Stat"
+msgstr "Estadística principal 3C"
+
+msgid "1C Main Stat"
+msgstr "Estadística principal 1C"
+
+msgid "Weight Crit Rate"
+msgstr "Peso: Prob. CRIT"
+
+msgid "Weight Crit Damage"
+msgstr "Peso: Daño CRIT"
+
+msgid "Weight Attack %"
+msgstr "Peso: ATQ %"
+
+msgid "Weight Defense %"
+msgstr "Peso: DEF %"
+
+msgid "Weight HP %"
+msgstr "Peso: Vida %"
+
+msgid "Weight Flat Attack"
+msgstr "Peso: ATQ fijo"
+
+msgid "Weight Flat Defense"
+msgstr "Peso: DEF fija"
+
+msgid "Weight Flat HP"
+msgstr "Peso: Vida fija"
+
+msgid "Weight Energy Regen"
+msgstr "Peso: Regeneración de energía"
+
+msgid "Weight Basic Attack"
+msgstr "Peso: Daño de ataque básico"
+
+msgid "Weight Heavy Attack"
+msgstr "Peso: Daño de ataque pesado"
+
+msgid "Weight Resonance Skill"
+msgstr "Peso: Daño de habilidad de resonancia"
+
+msgid "Weight Resonance Liberation"
+msgstr "Peso: Daño de liberación de resonancia"
+
+msgid "Output Directory"
+msgstr "Directorio de salida"
+
+msgid "COSTs"
+msgstr "Pestañas COST"
+
+msgid "Max Pages Per COST"
+msgstr "Máximo de páginas por COST"
+
+msgid "Scroll Count"
+msgstr "Cantidad de desplazamiento"
+
+msgid "Settle Seconds"
+msgstr "Segundos de espera"
+
+msgid "Crit Rate"
+msgstr "Prob. CRIT"
+
+msgid "Crit Damage"
+msgstr "Daño CRIT"
+
+msgid "Attack %"
+msgstr "ATQ %"
+
+msgid "Defense %"
+msgstr "DEF %"
+
+msgid "HP %"
+msgstr "Vida %"
+
+msgid "Healing Bonus"
+msgstr "Bonif. de curación"
+
+msgid "Glacio DMG Bonus"
+msgstr "Bonif. de daño Glacio"
+
+msgid "Fusion DMG Bonus"
+msgstr "Bonif. de daño Fusion"
+
+msgid "Electro DMG Bonus"
+msgstr "Bonif. de daño Electro"
+
+msgid "Aero DMG Bonus"
+msgstr "Bonif. de daño Aero"
+
+msgid "Spectro DMG Bonus"
+msgstr "Bonif. de daño Spectro"
+
+msgid "Havoc DMG Bonus"
+msgstr "Bonif. de daño Havoc"
+
+msgid "Energy Regen"
+msgstr "Regeneración de energía"
+
+msgid "角色默认模板 JSON；相对路径按 OK-WW 项目根目录解析"
+msgstr ""
+"JSON de plantilla predeterminado; las rutas relativas parten de la raíz de "
+"OK-WW"
+
+msgid "选择角色及其套装、当前五件、候选声骸和模型策略"
+msgstr ""
+"Selecciona personaje, conjunto, cinco Ecos actuales, candidatos y política "
+"del modelo"
+
+msgid "本次检查接受的 4C 主属性"
+msgstr "Estadística principal 4C aceptada"
+
+msgid "本次检查接受的 3C 主属性"
+msgstr "Estadística principal 3C aceptada"
+
+msgid "本次检查接受的 1C 主属性"
+msgstr "Estadística principal 1C aceptada"
+
+msgid "检查结果根目录；每次运行会创建独立时间目录"
+msgstr "Raíz de resultados; cada ejecución crea un directorio con fecha"
+
+msgid "要检查的 COST 页签"
+msgstr "Pestañas COST que comprobar"
+
+msgid "每个 COST 的安全页数上限"
+msgstr "Límite de seguridad de páginas por COST"
+
+msgid "每次向下滚动的格数"
+msgstr "Casillas que se desplazan hacia abajo cada vez"
+
+msgid "切换、点击或滚动后的等待秒数"
+msgstr "Segundos de espera tras cambiar, pulsar o desplazar"
+
+msgid "① 检查套装与声骸（不强化）"
+msgstr "① Comprobar conjunto y Ecos (sin mejorar)"
+
+msgid "严格选择并读回角色对应合鸣套装，设置等级从高到低后扫描满级声骸；只生成供用户检查的结果文件，不进入培养。"
+msgstr ""
+"Selecciona y verifica el conjunto del personaje, ordena por nivel "
+"descendente y escanea Ecos al máximo; solo genera un archivo para revisión, "
+"sin mejorar."
+
+msgid "暴击副属性每一点的模型权重"
+msgstr "Peso del modelo por punto de Prob. CRIT"
+
+msgid "暴击伤害副属性每一点的模型权重"
+msgstr "Peso del modelo por punto de Daño CRIT"
+
+msgid "百分比攻击副属性每一点的模型权重"
+msgstr "Peso del modelo por punto de ATQ %"
+
+msgid "百分比防御副属性每一点的模型权重"
+msgstr "Peso del modelo por punto de DEF %"
+
+msgid "百分比生命副属性每一点的模型权重"
+msgstr "Peso del modelo por punto de Vida %"
+
+msgid "固定攻击副属性每一点的模型权重"
+msgstr "Peso del modelo por punto de ATQ fijo"
+
+msgid "固定防御副属性每一点的模型权重"
+msgstr "Peso del modelo por punto de DEF fija"
+
+msgid "固定生命副属性每一点的模型权重"
+msgstr "Peso del modelo por punto de Vida fija"
+
+msgid "共鸣效率副属性每一点的模型权重"
+msgstr "Peso del modelo por punto de regeneración de energía"
+
+msgid "普攻伤害副属性每一点的模型权重"
+msgstr "Peso del modelo por punto de daño de ataque básico"
+
+msgid "重击伤害副属性每一点的模型权重"
+msgstr "Peso del modelo por punto de daño de ataque pesado"
+
+msgid "共鸣技能伤害副属性每一点的模型权重"
+msgstr "Peso del modelo por punto de daño de habilidad de resonancia"
+
+msgid "共鸣解放伤害副属性每一点的模型权重"
+msgstr "Peso del modelo por punto de daño de liberación de resonancia"
+
+msgid "echo_character_templates.json"
+msgstr "echo_character_templates.json"
+
+msgid "artifacts/echo_inventory/checks"
+msgstr "artifacts/echo_inventory/checks"
+
+msgid "1"
+msgstr "1"
+
+msgid "3"
+msgstr "3"
+
+msgid "4"
+msgstr "4"
