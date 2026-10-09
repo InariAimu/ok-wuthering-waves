@@ -1596,3 +1596,54 @@ msgstr "3"
 
 msgid "4"
 msgstr "4"
+
+msgid "Candidate Switch Ratio"
+msgstr "Ratio de eficiencia para cambiar de candidato"
+
+msgid "Missing Candidate Stop Ratio"
+msgstr "Ratio para detenerse por falta de candidatos"
+
+msgid "Fresh Candidate Samples"
+msgstr "Muestras para candidatos sin mejorar"
+
+msgid "Maximum Decision Samples"
+msgstr "Máximo de muestras por decisión"
+
+msgid "Decision Log Directory"
+msgstr "Directorio del registro de decisiones"
+
+msgid ""
+"Switch when another available candidate is this many times as efficient"
+msgstr ""
+"Cambiar cuando otro candidato disponible alcance este múltiplo de la "
+"eficiencia del actual"
+
+msgid ""
+"Stop when available efficiency is below this fraction of the best missing "
+"candidate"
+msgstr ""
+"Detenerse si la eficiencia del mejor candidato disponible es inferior a esta"
+" fracción de la del mejor candidato agotado"
+
+msgid ""
+"Samples used to compare fresh candidates with joint inventory optimization"
+msgstr ""
+"Muestras para comparar candidatos sin mejorar mediante la optimización "
+"conjunta del inventario"
+
+msgid ""
+"Maximum samples used when a decision is near a switching or stopping "
+"threshold"
+msgstr ""
+"Máximo de muestras cuando la decisión está cerca del umbral de cambio o "
+"detención"
+
+msgid ""
+"Directory for JSONL decisions, current JSON state and a readable Markdown "
+"summary"
+msgstr ""
+"Directorio para decisiones en JSONL, estado actual en JSON y un resumen "
+"legible en Markdown"
+
+msgid "artifacts/echo_inventory/enhancement_runs"
+msgstr "artifacts/echo_inventory/enhancement_runs"

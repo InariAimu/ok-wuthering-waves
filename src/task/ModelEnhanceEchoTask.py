@@ -11,16 +11,27 @@ from dataclasses import asdict, replace
 from datetime import datetime, timezone
 import json
 from pathlib import Path
+import re
 from typing import Mapping
 
-from src.echo.optimizer import CampaignEvent, CampaignResult, StagedUpgradeCampaign
+import cv2
+import numpy as np
+
+from src.echo.adaptive import AdaptiveEnhancementSession, AdaptivePolicy, simulate_adaptive_session
+from src.echo.api import EchoResourceSnapshot, ResourceSource
+from src.echo.decision_log import DecisionJournal
+from src.echo.optimizer import CampaignEvent, CampaignResult
 from src.echo.simulation import EchoStat
 from src.echo.workflow import (
     EchoInventoryCheckResult,
     named_echo_build_to_dict,
     policy_config_to_dict,
 )
-from src.task.EnhanceEchoTask import EnhanceEchoTask
+from src.task.EnhanceEchoTask import (
+    EnhanceEchoTask, NoEligibleFreshEchoError, ECHO_INVENTORY_COST_TABS,
+    ECHO_INVENTORY_GRID_COLUMNS, ECHO_INVENTORY_GRID_ROWS,
+    ECHO_INVENTORY_LEVEL_ROWS, ECHO_INVENTORY_SORT_DIRECTION,
+)
 
 
 STAT_LABELS = {
@@ -65,6 +76,7 @@ ACTION_LABELS = {
     "start": "选择新胚子",
     "continue": "模拟开孔",
     "replace_success": "模拟替换成功",
+    "keep_reserve": "模拟保留备选",
     "discard_failure": "模拟弃置",
     "discard_resource_stop": "资源不足停止",
 }
@@ -119,7 +131,14 @@ class ModelEnhanceEchoTask(EnhanceEchoTask):
             "Simulation Tuners": 1000,
             "Simulation Premium Echo EXP Tubes": 300,
             "Simulation Output Directory": "artifacts/echo_inventory/simulations",
-            "Max Candidates Per Run": 1,
+            "Max Candidates Per Run": 0,
+            "Max Candidate Search Pages": 30,
+            "Pause after Success": False,
+            "Candidate Switch Ratio": 1.25,
+            "Missing Candidate Stop Ratio": 0.5,
+            "Fresh Candidate Samples": 20000,
+            "Maximum Decision Samples": 80000,
+            "Decision Log Directory": "artifacts/echo_inventory/enhancement_runs",
         })
         self.config_type = {
             "Resource Source": {
@@ -144,6 +163,11 @@ class ModelEnhanceEchoTask(EnhanceEchoTask):
                 "模拟可用特级密音筒等价数，每个按5000经验计算"
             ),
             "Simulation Output Directory": "模拟 JSON 决策日志的输出目录",
+            "Candidate Switch Ratio": "Switch when another available candidate is this many times as efficient",
+            "Missing Candidate Stop Ratio": "Stop when available efficiency is below this fraction of the best missing candidate",
+            "Fresh Candidate Samples": "Samples used to compare fresh candidates with joint inventory optimization",
+            "Maximum Decision Samples": "Maximum samples used when a decision is near a switching or stopping threshold",
+            "Decision Log Directory": "Directory for JSONL decisions, current JSON state and a readable Markdown summary",
         })
         self._loaded_inspection_result: EchoInventoryCheckResult | None = None
 
@@ -268,14 +292,220 @@ class ModelEnhanceEchoTask(EnhanceEchoTask):
             result.candidate_pool,
             config=result.policy,
         )
-        best = self._largest_inspected_improvement(result)
-        if best is not None:
-            self.set_candidate_cost_order((int(best["cost"]),))
+        # The inspection's largest single replacement is display information;
+        # it must not lock the whole run to one COST tab.
         self._selected_sonata_set = result.sonata_set
         self._loaded_inspection_result = result
         self._publish_preflight(result)
         self.info_set("检查时可提升声骸", result.replacement_count)
         return result
+
+    def _adaptive_policy(self):
+        return AdaptivePolicy(
+            switch_efficiency_ratio=float(self.config.get('Candidate Switch Ratio', 1.25)),
+            missing_candidate_stop_ratio=float(self.config.get('Missing Candidate Stop Ratio', .5)),
+            fresh_samples=int(self.config.get('Fresh Candidate Samples', 20000)),
+            maximum_samples=int(self.config.get('Maximum Decision Samples', 80000)),
+        )
+
+    def _adaptive_event(self, kind, payload):
+        if kind == 'candidate_ranking':
+            self.info_set('动态目标决策', payload['reason'])
+            selected = payload['selected']
+            best = payload['best_legal']
+            self.info_set('下一强化目标', selected['name'] if selected else '停止开启新胚子')
+            self.info_set('最佳合法目标', best['name'] if best else '无')
+            missing = [row for row in payload['rankings'] if row['remaining'] == 0
+                       and row['relative_efficiency'] >= self._adaptive_policy().missing_candidate_stop_ratio]
+            self.info_set('建议获取胚子', '；'.join(
+                f"{row['identity']['name']}/COST {row['identity']['cost']}/"
+                f"{self._main_stat_label(row['identity']['compatibility'])}" for row in missing) or '无')
+            for row in payload['rankings']:
+                metrics, identity = row['metrics'], row['identity']
+                self.log_info(f"[候选排名] {identity['name']}/COST {identity['cost']} "
+                    f"库存={row['remaining']}({row['availability']}) "
+                    f"联合提升概率={metrics['success_probability']:.3%} "
+                    f"平均正提升={metrics['expected_gain']:.6f} "
+                    f"净材料效率={metrics['efficiency']:.4f} "
+                    f"相对最佳={row['relative_efficiency']:.3f} 样本={metrics['samples']}")
+            self.log_info(f"[动态调度] {payload['action']}: {payload['reason']}",
+                          notify=selected is None)
+        elif kind == 'joint_optimization':
+            self.info_set('联合优化提升', round(payload['score_gain'], 4))
+            self.log_info(f"[联合优化] +25后重新组合全部已知库存，提升={payload['score_gain']:.4f}；逻辑配装尚未在游戏中应用")
+        elif kind == 'stopped':
+            self.info_set('强化停止原因', payload['reason'])
+            self.log_info(f"[强化停止] {payload['reason']}")
+
+    def _new_adaptive_session(self, result, resources, *, policy=None, mode='live'):
+        adaptive = self._adaptive_policy()
+        completed = result.completed_inventory()
+        root = Path(str(self.config.get('Decision Log Directory') or
+                        'artifacts/echo_inventory/enhancement_runs')).expanduser().resolve()
+        directory = root / datetime.now().strftime('%Y%m%d_%H%M%S_%f')
+        journal = DecisionJournal(directory)
+        self.info_set('强化决策日志', str(directory / 'summary.md'))
+        self.log_info(f'强化决策日志: {directory}')
+        return AdaptiveEnhancementSession(result.build, result.candidate_pool,
+            resources=resources, config=policy or result.policy, completed_inventory=completed,
+            # A prior check's stock can be stale. Live mode verifies it through
+            # target-specific searches before recording any shortage.
+            availability=result.simulated_stock() if mode == 'simulation_only' else None,
+            adaptive_policy=adaptive, journal=journal, event_listener=self._adaptive_event,
+            mode=mode, source=result.source_path)
+
+    def _prepare_enhancement_runtime(self):
+        if getattr(self, '_session_is_external', False) or self._loaded_inspection_result is None:
+            return super()._prepare_enhancement_runtime()
+        self._manual_resource_ledger = None
+        self._echo_enhancement_session = self._new_adaptive_session(
+            self._loaded_inspection_result, self._resolve_resources())
+        self._last_resource_sync_completed = 0
+        self._publish_resources(self._echo_enhancement_session.ledger)
+
+    def _read_adaptive_stack_count(self, column, row):
+        """A bare card number is quantity only after +0 detail validation."""
+        readings = []
+        for _ in range(2):
+            self.next_frame()
+            frame = self.frame
+            offset = self._echo_inventory_capture_y_offset(frame)
+            x, y = ECHO_INVENTORY_GRID_COLUMNS[column], ECHO_INVENTORY_LEVEL_ROWS[row]
+            boxes = self.ocr(x-.002, y-.012+offset, x+.036, y+.028+offset,
+                             frame=frame, threshold=.1)
+            values = [int(box.name.strip()) for box in boxes
+                      if re.fullmatch(r'[1-9]\d{0,4}', box.name.strip())]
+            readings.append(values[0] if len(values) == 1 else None)
+        return readings[0] if readings[0] == readings[1] else None
+
+    def _adaptive_grid_frame(self):
+        self.next_frame()
+        frame = self.frame
+        offset = self._echo_inventory_capture_y_offset(frame)
+        height, width = frame.shape[:2]
+        return frame[int((.14+offset)*height):int((.89+offset)*height),
+                     int(.11*width):int(.31*width)].copy()
+
+    def _adaptive_scroll_changed(self, count, settle_time):
+        before = self._adaptive_grid_frame()
+        self.scroll_relative(.25, .70, -count)
+        self.sleep(settle_time)
+        after = self._adaptive_grid_frame()
+        if before.shape != after.shape:
+            return True
+        difference = cv2.absdiff(before, after)
+        # Compare before/after the scroll without intervening card selection.
+        # A moving/animated frame remains inconclusive and reaches the limit
+        # rather than being silently classified as missing inventory.
+        return float(np.mean(difference)) >= .5 or float(np.percentile(difference, 99)) >= 8
+
+    def _find_adaptive_fresh_echo(self, target, settle_time=.5):
+        session = self._echo_enhancement_session
+        max_pages = max(1, int(self.config.get('Max Candidate Search Pages') or 10))
+        scroll_count = max(1, int(self.config.get('Candidate Search Scroll Count') or 10))
+        self.click_relative(*ECHO_INVENTORY_COST_TABS[target.cost], after_sleep=settle_time)
+        self._active_candidate_cost = target.cost
+        self.select_echo_inventory_level_descending(settle_time=settle_time)
+        issues = []
+        completed_directions = 0
+        search_id = len(session.events)
+        for direction in range(2):
+            # The level label does not encode direction. Search both orders;
+            # toggling twice also resets the viewport left at the last Echo.
+            for _ in range(2 if direction == 0 else 1):
+                self.click_relative(*ECHO_INVENTORY_SORT_DIRECTION, after_sleep=settle_time)
+            for page in range(max_pages):
+                self.info_set('候选搜索目标', f'{target.name}/COST {target.cost}')
+                self.info_set('候选搜索页', page+1)
+                for row, y in enumerate(ECHO_INVENTORY_GRID_ROWS):
+                    for column, x in enumerate(ECHO_INVENTORY_GRID_COLUMNS):
+                        card_level = self._read_echo_card_level(column, row)
+                        if card_level is not None and card_level != 0:
+                            continue
+                        self.click_relative(x, y, after_sleep=settle_time)
+                        level = self._read_selected_echo_level()
+                        if level is None:
+                            issues.append(f'direction={direction} page={page} cell={row},{column}: unreadable level')
+                            continue
+                        if level != 0:
+                            continue
+                        try:
+                            identity = self._read_current_echo_candidate_identity()
+                            if identity != self._read_current_echo_candidate_identity():
+                                raise ValueError('identity changed between reads')
+                        except (RuntimeError, ValueError) as error:
+                            issues.append(f'direction={direction} page={page} cell={row},{column}: {error}')
+                            continue
+                        quantity = self._read_adaptive_stack_count(column, row)
+                        session.observe_stock(identity, quantity,
+                            evidence=f'live +0 details, COST {target.cost}, direction {direction}, page {page}, cell {row},{column}',
+                            confirmed_available=True)
+                        if identity == target:
+                            self._selected_model_candidate_identity = identity
+                            return True
+                if session.journal:
+                    self.next_frame()
+                    self._write_echo_inventory_png(session.journal.directory /
+                        f'search_{search_id}_{target.cost}_{direction}_{page}.png', self.frame)
+                if not self._adaptive_scroll_changed(scroll_count, settle_time):
+                    completed_directions += 1
+                    break
+        if completed_directions != 2 or issues:
+            session.emit('search_incomplete', dict(identity=asdict(target),
+                completed_directions=completed_directions, issues=issues, page_limit=max_pages))
+            raise RuntimeError('候选搜索未完整确认，未将该胚子记为缺货；请检查决策日志和搜索截图')
+        session.observe_stock(target, 0, evidence='both level sort directions reached unchanged scroll end; no unreadable details')
+        return False
+
+    def _select_first_fresh_echo(self, settle_time=.5):
+        session = self._echo_enhancement_session
+        if not isinstance(session, AdaptiveEnhancementSession):
+            return super()._select_first_fresh_echo(settle_time)
+        if (getattr(self, '_echo_resource_provider', None) is not None and
+                self.config.get('Resource Source') != 'Manual' and
+                session.completed_candidates != getattr(self, '_last_resource_sync_completed', -1)):
+            observed = self._resolve_resources()
+            if observed.source == ResourceSource.OK_WW:
+                session.synchronize_resources(observed)
+                self._publish_resources(session.ledger)
+            else:
+                session.emit('resource_read_unavailable', dict(detail=observed.detail,
+                    action='retain current ledger; never reset to the original manual budget'))
+            self._last_resource_sync_completed = session.completed_candidates
+        while True:
+            selection = session.choose_candidate()
+            if selection.selected is None:
+                session.stop(selection.reason)
+                raise NoEligibleFreshEchoError(selection.reason)
+            if self._find_adaptive_fresh_echo(selection.selected, settle_time):
+                # Search can discover previously unknown compatible names.
+                # Re-rank those observations before spending on this card.
+                confirmed = session.choose_candidate()
+                if confirmed.selected != selection.selected:
+                    continue
+                session.begin_candidate(selection.selected)
+                return 0
+
+    def _stop_for_resources(self, cost):
+        if isinstance(self._echo_enhancement_session, AdaptiveEnhancementSession):
+            self._echo_enhancement_session.stop('resources cannot pay for the next staged reveal')
+        return super()._stop_for_resources(cost)
+
+    def _model_ui_event(self, kind, **details):
+        session = self._echo_enhancement_session
+        if not isinstance(session, AdaptiveEnhancementSession):
+            return
+        if kind == 'upgrade_click_intent':
+            session.unreconciled_upgrade = True
+        elif kind == 'reveal_recorded':
+            session.unreconciled_upgrade = False
+        if session.journal and kind != 'upgrade_clicked':
+            self.next_frame()
+            path = session.journal.directory / (
+                f'candidate_{session.candidate_number:04d}_plus{details["target_slots"]*5}_{kind}.png')
+            self._write_echo_inventory_png(path, self.frame)
+            details['screenshot'] = str(path)
+        session.emit(kind, details)
 
     def _publish_simulation_event(self, event: CampaignEvent) -> None:
         action = ACTION_LABELS.get(event.action, event.action)
@@ -296,13 +526,15 @@ class ModelEnhanceEchoTask(EnhanceEchoTask):
 
     def _simulation_report_data(
             self, source: EchoInventoryCheckResult,
-            campaign: CampaignResult) -> dict[str, object]:
+            campaign: CampaignResult, session=None) -> dict[str, object]:
         ledger = campaign.ledger
         return {
             "kind": "ok-ww.echo-enhancement-simulation",
             "schema_version": 1,
             "created_at": datetime.now(timezone.utc).isoformat(),
             "mode": "simulation_only",
+            "adaptive_decision_log": str(session.journal.directory) if session and session.journal else None,
+            "adaptive_state": session.audit_snapshot() if session else None,
             "safety": {
                 "game_ui_touched": False,
                 "game_resources_consumed": False,
@@ -328,6 +560,7 @@ class ModelEnhanceEchoTask(EnhanceEchoTask):
                 "initial_score": campaign.initial_build.score,
                 "final_score": campaign.final_build.score,
                 "score_gain": campaign.final_build.score - campaign.initial_build.score,
+                "successes_include_kept_reserves": True,
             },
             "resources": {
                 "initial_tuners": ledger.initial_tuners,
@@ -347,7 +580,7 @@ class ModelEnhanceEchoTask(EnhanceEchoTask):
 
     def _write_simulation_report(
             self, source: EchoInventoryCheckResult,
-            campaign: CampaignResult) -> Path:
+            campaign: CampaignResult, session=None) -> Path:
         root = Path(
             str(self.config.get("Simulation Output Directory") or
                 "artifacts/echo_inventory/simulations")
@@ -357,7 +590,7 @@ class ModelEnhanceEchoTask(EnhanceEchoTask):
         target.parent.mkdir(parents=True, exist_ok=False)
         target.write_text(
             json.dumps(
-                self._simulation_report_data(source, campaign),
+                self._simulation_report_data(source, campaign, session),
                 ensure_ascii=False,
                 indent=2,
             ),
@@ -386,17 +619,18 @@ class ModelEnhanceEchoTask(EnhanceEchoTask):
             f"开始模拟强化: 尝试上限={attempts}, 每状态抽样={samples}, "
             f"模拟调谐器={tuners:.1f}, 模拟经验={tubes * 5000:.0f}; 不操作游戏"
         )
-        campaign = StagedUpgradeCampaign(
-            result.build,
-            result.candidate_pool,
-            tuners=tuners,
-            echo_exp=tubes * 5_000,
-            config=policy,
-        ).run()
+        session = self._new_adaptive_session(result,
+            EchoResourceSnapshot.manual(tuners=tuners, echo_exp=tubes * 5000),
+            policy=policy, mode='simulation_only')
+        try:
+            campaign = simulate_adaptive_session(session, attempts)
+        except Exception as error:
+            session.stop('模拟异常停止，保留决策状态供检查', error=repr(error))
+            raise
         for event in campaign.events:
             self._publish_simulation_event(event)
 
-        report = self._write_simulation_report(result, campaign)
+        report = self._write_simulation_report(result, campaign, session)
         self.info_set("模拟状态", "完成")
         self.info_set("模拟成功", campaign.successes)
         self.info_set("模拟失败", campaign.failures)
@@ -431,4 +665,14 @@ class ModelEnhanceEchoTask(EnhanceEchoTask):
             return self._run_simulation(result)
 
         self.select_echo_sonata_set(result.sonata_set, settle_time=1.5)
-        return super().run()
+        try:
+            return super().run()
+        except Exception as error:
+            session = self._echo_enhancement_session
+            if isinstance(session, AdaptiveEnhancementSession):
+                session.stop('任务异常停止，保留当前候选与账本供检查', error=repr(error))
+            raise
+        finally:
+            session = self._echo_enhancement_session
+            if isinstance(session, AdaptiveEnhancementSession) and not session.stop_reason:
+                session.stop('达到本轮处理上限或任务正常返回')

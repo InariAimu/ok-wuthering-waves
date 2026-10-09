@@ -98,8 +98,24 @@ from src.echo.workflow import (
     policy_config_from_dict,
     policy_config_to_dict,
 )
+from src.echo.adaptive import (
+    AdaptiveEnhancementSession,
+    AdaptivePolicy,
+    CandidateRanking,
+    CandidateSelection,
+    simulate_adaptive_session,
+)
+from src.echo.decision_log import DecisionJournal
+from src.echo.joint import JointInventory
 
 __all__ = [
+    "AdaptiveEnhancementSession",
+    "AdaptivePolicy",
+    "CandidateRanking",
+    "CandidateSelection",
+    "DecisionJournal",
+    "JointInventory",
+    "simulate_adaptive_session",
     "ALL_STATS",
     "BenchmarkLedger",
     "BenchmarkRun",

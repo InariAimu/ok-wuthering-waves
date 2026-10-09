@@ -75,3 +75,6 @@ repo/
 
 assets/result.json
 src/gui/CharacterCodeTab.py
+
+# Local Echo scans, screenshots, simulation reports and decision journals
+/artifacts/

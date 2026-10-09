@@ -1640,3 +1640,44 @@ msgstr "3"
 
 msgid "4"
 msgstr "4"
+
+msgid "Candidate Switch Ratio"
+msgstr "후보 전환 효율 배율"
+
+msgid "Missing Candidate Stop Ratio"
+msgstr "후보 부족 시 중단 효율 비율"
+
+msgid "Fresh Candidate Samples"
+msgstr "미강화 후보 평가 표본 수"
+
+msgid "Maximum Decision Samples"
+msgstr "판단 최대 표본 수"
+
+msgid "Decision Log Directory"
+msgstr "판단 로그 디렉터리"
+
+msgid ""
+"Switch when another available candidate is this many times as efficient"
+msgstr "보유 중인 다른 후보의 효율이 현재 대상의 이 배율에 도달하면 전환합니다"
+
+msgid ""
+"Stop when available efficiency is below this fraction of the best missing "
+"candidate"
+msgstr "보유한 최선 후보의 효율이 부족한 최선 후보 대비 이 비율보다 낮으면 중단합니다"
+
+msgid ""
+"Samples used to compare fresh candidates with joint inventory optimization"
+msgstr "전체 보유 에코 조합을 최적화하여 미강화 후보를 비교할 때 사용하는 표본 수"
+
+msgid ""
+"Maximum samples used when a decision is near a switching or stopping "
+"threshold"
+msgstr "전환 또는 중단 기준에 가까울 때 추가 추출하는 최대 표본 수"
+
+msgid ""
+"Directory for JSONL decisions, current JSON state and a readable Markdown "
+"summary"
+msgstr "JSONL 판단 내역, 최신 JSON 상태 및 읽기 쉬운 Markdown 요약을 저장하는 디렉터리"
+
+msgid "artifacts/echo_inventory/enhancement_runs"
+msgstr "artifacts/echo_inventory/enhancement_runs"

@@ -1687,3 +1687,44 @@ msgstr "3"
 
 msgid "4"
 msgstr "4"
+
+msgid "Candidate Switch Ratio"
+msgstr "候选切换效率倍率"
+
+msgid "Missing Candidate Stop Ratio"
+msgstr "缺货停手效率比例"
+
+msgid "Fresh Candidate Samples"
+msgstr "新胚子评估样本数"
+
+msgid "Maximum Decision Samples"
+msgstr "决策最大样本数"
+
+msgid "Decision Log Directory"
+msgstr "决策日志目录"
+
+msgid ""
+"Switch when another available candidate is this many times as efficient"
+msgstr "其他有库存胚子的效率达到当前目标的此倍率时切换"
+
+msgid ""
+"Stop when available efficiency is below this fraction of the best missing "
+"candidate"
+msgstr "现有最佳胚子的效率低于最佳缺货目标的此比例时停手"
+
+msgid ""
+"Samples used to compare fresh candidates with joint inventory optimization"
+msgstr "通过全库存联合优化比较新胚子时的抽样数"
+
+msgid ""
+"Maximum samples used when a decision is near a switching or stopping "
+"threshold"
+msgstr "接近切换或停手阈值时追加抽样的最大样本数"
+
+msgid ""
+"Directory for JSONL decisions, current JSON state and a readable Markdown "
+"summary"
+msgstr "保存 JSONL 决策明细、最新 JSON 状态和可阅读 Markdown 摘要的目录"
+
+msgid "artifacts/echo_inventory/enhancement_runs"
+msgstr "artifacts/echo_inventory/enhancement_runs"

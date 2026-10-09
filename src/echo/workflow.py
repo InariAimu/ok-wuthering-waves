@@ -201,6 +201,45 @@ class EchoInventoryCheckResult:
         replacements = self.inspection.get("replacements", [])
         return len(replacements) if isinstance(replacements, list) else 0
 
+    def completed_inventory(self) -> tuple[NamedEquippedEcho, ...]:
+        """Read every completed scanned variant, not just single-slot upgrades."""
+        scan = self.inspection.get('scan', {})
+        if not isinstance(scan, Mapping):
+            raise TypeError('inspection.scan must be an object')
+        items = scan.get('items', [])
+        if not isinstance(items, list):
+            raise TypeError('inspection.scan.items must be an array')
+        result = []
+        for index, item in enumerate(items):
+            if not isinstance(item, Mapping):
+                raise TypeError('each scanned Echo must be an object')
+            if item.get('level') != 25:
+                continue
+            raw_rolls = item.get('substats', [])
+            if len(raw_rolls) != 5:
+                raise ValueError('completed inventory Echo must have five substats')
+            state = EchoState(tuple(EchoRoll.from_value(EchoStat(roll['stat']), float(roll['value']))
+                                    for roll in raw_rolls))
+            result.append(NamedEquippedEcho(f'scanned-{index}',
+                EchoIdentity(str(item['name']), int(item['cost']), str(item['compatibility'])), state))
+        return tuple(result)
+
+    def simulated_stock(self) -> dict[EchoIdentity, int | None]:
+        """Optional explicit stock for offline simulations; live runs recheck."""
+        rows = self.inspection.get('fresh_stock', [])
+        if not isinstance(rows, list):
+            raise TypeError('inspection.fresh_stock must be an array')
+        result = {}
+        for row in rows:
+            identity = _identity_from_dict(row['identity'])
+            count = row['count']
+            if count is not None and (not isinstance(count, int) or isinstance(count, bool) or count < 0):
+                raise ValueError('fresh_stock count must be a non-negative integer or null')
+            if identity in result:
+                raise ValueError('fresh_stock contains duplicate identities')
+            result[identity] = count
+        return result
+
     def to_dict(self) -> dict[str, object]:
         return {
             "kind": ECHO_CHECK_RESULT_KIND,

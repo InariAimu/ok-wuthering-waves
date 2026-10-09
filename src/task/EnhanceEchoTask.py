@@ -262,6 +262,38 @@ class EnhanceEchoTask(BaseWWTask, FindFeature):
         return pairs
 
     @staticmethod
+    def _model_state_from_ocr_tokens(tokens, previous: EchoState) -> EchoState:
+        # Preserve row positions: dropping a noisy numeric token such as
+        # "'9.2%" must never shift the next row's value onto this stat.
+        rows = pair_echo_stat_rows(tokens)
+        observed = echo_state_from_ocr_pairs([
+            (row.label, row.value_text) for row in rows
+        ])
+        if observed.slot_count != previous.slot_count + 1:
+            raise ValueError('staged reveal must contain exactly one new substat')
+        if observed.rolls[:previous.slot_count] != previous.rolls:
+            raise ValueError('observed state does not extend the previous state')
+        return observed
+
+    def _read_enhancement_model_state(self, previous: EchoState, initial_tokens=None) -> EchoState:
+        last_error = None
+        for attempt in range(3):
+            tokens = initial_tokens if attempt == 0 else None
+            if tokens is None:
+                self.next_frame()
+                frame = self.frame
+                y_offset = self._echo_inventory_capture_y_offset(frame)
+                tokens = self.ocr(0.09, 0.3 + y_offset, 0.40,
+                                  min(1.0, 0.53 + y_offset), frame=frame,
+                                  threshold=0.1)
+            try:
+                return self._model_state_from_ocr_tokens(tokens, previous)
+            except ValueError as error:
+                last_error = error
+                self.sleep(0.3)
+        raise RuntimeError(f'无法将OCR副词条转换为强化模型数据: {last_error}')
+
+    @staticmethod
     def _write_echo_inventory_png(path: Path, frame) -> None:
         encoded, data = cv2.imencode('.png', frame)
         if not encoded:
@@ -645,10 +677,13 @@ class EnhanceEchoTask(BaseWWTask, FindFeature):
             # OCR. Re-read narrow crops of this same frame before rejecting
             # the stack; never infer level from its quantity or main stat.
             observed_level = self._read_selected_echo_level(frame=frame)
-            if observed_level is not None:
-                identity = tuple(identity) + (
-                    Box(0, 0, 0, 0, name=f'+{observed_level}'),
-                )
+        if observed_level is not None:
+            # The adjacent status icon can merge into the token ("+0⑧").
+            # Forward the explicit observed level in canonical form so the
+            # strict inventory parser does not reject that trailing icon.
+            identity = tuple(identity) + (
+                Box(0, 0, 1, 1, name=f'+{observed_level}'),
+            )
         if cost is None:
             for x, y, to_x, to_y in (
                 (0.80, 0.18, 0.87, 0.25),
@@ -1216,7 +1251,10 @@ class EnhanceEchoTask(BaseWWTask, FindFeature):
         self.click(0.13, 0.21, after_sleep=0.5)
         return self.is_0_level()
 
-    def run(self):
+    def _model_ui_event(self, kind: str, **details) -> None:
+        """Optional audit hook for model integrations; legacy tasks do nothing."""
+
+    def run(self, *, resume_candidate: tuple[EchoIdentity, EchoState] | None = None):
         self.info_set('成功声骸数量', 0)
         self.info_set('失败声骸数量', 0)
         self._prepare_enhancement_runtime()
@@ -1224,58 +1262,68 @@ class EnhanceEchoTask(BaseWWTask, FindFeature):
         # spending resources, so deleting prior screenshots at startup makes
         # diagnosis unnecessarily destructive.
         Path('screenshots').mkdir(parents=True, exist_ok=True)
+        if resume_candidate is not None:
+            identity, observed = resume_candidate
+            if (self._echo_enhancement_session is None or
+                    identity not in self._echo_enhancement_session.candidate_pool or
+                    not 1 <= observed.slot_count <= 5):
+                raise ValueError('A resumed candidate needs a model session and a verified revealed state')
         while True:
-            enhance = self.find_echo_enhance()
-            if not enhance:
-                raise Exception('必须在背包声骸界面过滤后开始!')
-            try:
-                current_level = self._select_first_fresh_echo()
-            except NoEligibleFreshEchoError as error:
-                self.info_set('候选搜索状态', '目标COST没有合格+0声骸')
-                self.info_set('候选搜索结果', str(error))
-                self.log_info(f'没有合格+0声骸，未消耗材料，任务结束: {error}')
-                return
-            enhance = self.find_echo_enhance()
-            if not enhance:
-                raise RuntimeError('选择首件声骸后找不到培养按钮')
-            if current_level != 0:
-                total = self.info_get('成功声骸数量') + self.info_get('失败声骸数量')
-                if self.debug:
-                    self.screenshot('无可强化声骸')
-                self.log_info(f'无可强化声骸, 任务结束! 强化{total}个, 符合条件{self.info_get("成功声骸数量")}个',
-                              notify=True)
-                if self.info_get('成功声骸数量') >= 1:
-                    try:
-                        os.startfile(os.path.abspath("screenshots"))
-                    except Exception as e:
-                        self.log_error(f"无法打开截图文件夹: {e}")
-                return
-            current_state = EchoState()
-            current_slot_count = 0
-            current_identity = None
-            if self._echo_enhancement_session is not None:
-                if self._echo_candidate_provider is not None:
-                    current_identity = self._echo_candidate_provider(self)
-                elif self._selected_model_candidate_identity is not None:
-                    current_identity = self._selected_model_candidate_identity
-                else:
-                    current_identity = self._read_current_echo_candidate_identity()
-                if current_identity not in self._echo_enhancement_session.candidate_pool:
-                    raise RuntimeError(
-                        f'当前声骸不在概率模型候选池: '
-                        f'{current_identity.name}/COST {current_identity.cost}/'
-                        f'{current_identity.compatibility}'
-                    )
-            start = time.time()
-            while time.time() - start < 5:
-                if enhance:
-                    self._click_capture_box_relative(
-                        enhance[0],
-                        after_sleep=0.5,
-                    )
+            if resume_candidate is not None:
+                # Caller has restored the ledger and verified this exact
+                # candidate while it remains open in cultivation.
+                current_identity, current_state = resume_candidate
+                current_slot_count = current_state.slot_count
+                resume_candidate = None
+            else:
                 enhance = self.find_echo_enhance()
                 if not enhance:
-                    break
+                    raise Exception('必须在背包声骸界面过滤后开始!')
+                try:
+                    current_level = self._select_first_fresh_echo()
+                except NoEligibleFreshEchoError as error:
+                    self.info_set('候选搜索状态', '停止开启新胚子')
+                    self.info_set('候选搜索结果', str(error))
+                    self.log_info(f'候选搜索或模型调度已停止，未开启下一件: {error}')
+                    return
+                enhance = self.find_echo_enhance()
+                if not enhance:
+                    raise RuntimeError('选择首件声骸后找不到培养按钮')
+                if current_level != 0:
+                    total = self.info_get('成功声骸数量') + self.info_get('失败声骸数量')
+                    if self.debug:
+                        self.screenshot('无可强化声骸')
+                    self.log_info(f'无可强化声骸, 任务结束! 强化{total}个, 符合条件{self.info_get("成功声骸数量")}个',
+                                  notify=True)
+                    if self.info_get('成功声骸数量') >= 1:
+                        try:
+                            os.startfile(os.path.abspath("screenshots"))
+                        except Exception as e:
+                            self.log_error(f"无法打开截图文件夹: {e}")
+                    return
+                current_state = EchoState()
+                current_slot_count = 0
+                current_identity = None
+                if self._echo_enhancement_session is not None:
+                    if self._echo_candidate_provider is not None:
+                        current_identity = self._echo_candidate_provider(self)
+                    elif self._selected_model_candidate_identity is not None:
+                        current_identity = self._selected_model_candidate_identity
+                    else:
+                        current_identity = self._read_current_echo_candidate_identity()
+                    if current_identity not in self._echo_enhancement_session.candidate_pool:
+                        raise RuntimeError(
+                            f'当前声骸不在概率模型候选池: '
+                            f'{current_identity.name}/COST {current_identity.cost}/'
+                            f'{current_identity.compatibility}'
+                        )
+                start = time.time()
+                while time.time() - start < 5:
+                    if enhance:
+                        self._click_capture_box_relative(enhance[0], after_sleep=0.5)
+                    enhance = self.find_echo_enhance()
+                    if not enhance:
+                        break
 
             while True:
                 if self._echo_enhancement_session is not None:
@@ -1336,10 +1384,12 @@ class EnhanceEchoTask(BaseWWTask, FindFeature):
                     time_out=2,
                 )
                 if enhance_and_tune:
+                    self._model_ui_event('upgrade_click_intent', target_slots=current_slot_count+1)
                     self._click_capture_box_relative(
                         enhance_and_tune[0],
                         after_sleep=1.5,
                     )
+                    self._model_ui_event('upgrade_clicked', target_slots=current_slot_count+1)
                 else:
                     if self.ocr(
                             0.17,
@@ -1384,14 +1434,11 @@ class EnhanceEchoTask(BaseWWTask, FindFeature):
                 self.info_set('值', values)
 
                 if self._echo_enhancement_session is not None:
-                    pairs = self._pair_ocr_stats(properties, values)
-                    try:
-                        observed_state = echo_state_from_ocr_pairs(pairs)
-                    except ValueError as error:
-                        raise RuntimeError(f'无法将OCR副词条转换为强化模型数据: {error}') from error
+                    observed_state = self._read_enhancement_model_state(current_state, texts)
                     self._echo_enhancement_session.record_reveal(
                         current_state, observed_state
                     )
+                    self._model_ui_event('reveal_recorded', target_slots=observed_state.slot_count)
                     self._publish_resources(self._echo_enhancement_session.ledger)
                     current_state = observed_state
                     current_slot_count = observed_state.slot_count

@@ -425,13 +425,29 @@ class StagedUpgradeCampaign:
 
     def evaluate(self, identity: EchoIdentity, state: EchoState) -> CompletionMetrics:
         raw = self._raw_metrics(identity, state)
-        samples = self.config.rollout_samples
+        return self._metrics_from_raw(
+            raw, state, include_refunds=not self.config.deferred_recycling,
+        )
+
+    def _metrics_from_raw(self, raw: _RawMetrics, state: EchoState, *,
+                          include_refunds: bool,
+                          samples: int | None = None,
+                          retained_probability: float | None = None) -> CompletionMetrics:
+        """Price an outcome estimate independently of physical recycling.
+
+        The live adaptive session uses net economic costs here, while its
+        cash ledger still spends gross materials and never invents refunds.
+        """
+        samples = samples or self.config.rollout_samples
         probability = raw.successes / samples
+        # Some integrations keep useful non-dominated reserves even when
+        # they do not improve today's best build. They yield no refund.
+        kept_probability = probability if retained_probability is None else retained_probability
         expected_gain = raw.positive_gain_sum / samples
         gain_on_success = raw.positive_gain_sum / raw.successes if raw.successes else 0.0
 
         additional = self.cost_model.upgrade_cost(state.slot_count, 5)
-        if self.config.deferred_recycling:
+        if not include_refunds:
             # The live task only marks failed Echoes as discarded.  They remain
             # in the inventory until the user processes them after the run, so
             # their possible refund cannot finance another reveal in this run.
@@ -442,11 +458,11 @@ class StagedUpgradeCampaign:
             refund_full = self.cost_model.recycle_refund(5)
             expected_tuners = (
                 additional.tuners + refund_now.tuners
-                - (1 - probability) * refund_full.tuners
+                - (1 - kept_probability) * refund_full.tuners
             )
             expected_exp = (
                 additional.echo_exp + refund_now.echo_exp
-                - (1 - probability) * refund_full.echo_exp
+                - (1 - kept_probability) * refund_full.echo_exp
             )
         tuner_pressure = expected_tuners / self.ledger.tuners if self.ledger.tuners > 0 else math.inf
         exp_pressure = expected_exp / self.ledger.echo_exp if self.ledger.echo_exp > 0 else math.inf
