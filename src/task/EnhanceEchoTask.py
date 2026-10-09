@@ -11,7 +11,7 @@ from typing import Callable, Iterable
 import cv2
 
 from ok import FindFeature, Logger
-from ok.feature.Box import get_bounding_box
+from ok.feature.Box import Box, get_bounding_box
 from src.echo.api import (
     EchoEnhancementSession,
     EchoResourceSnapshot,
@@ -53,12 +53,17 @@ ECHO_INVENTORY_GRID_ROWS = (0.225, 0.382, 0.537, 0.692, 0.847)
 # only a cheap +25 pre-filter; unreadable cells are still clicked and validated
 # against the right-hand details panel.
 ECHO_INVENTORY_LEVEL_ROWS = (0.255, 0.406, 0.555, 0.704, 0.852)
-ECHO_INVENTORY_LEVEL_RE = re.compile(r"(?:\+|\b)(\d{1,2})\s*$")
+# Bare numbers on fresh cards are stack quantities in 3.7. Only an explicit
+# plus sign establishes a level; otherwise open the card and read its details.
+ECHO_INVENTORY_LEVEL_RE = re.compile(r"[+＋]\s*(\d{1,2})\s*$")
 ECHO_SELECTED_LEVEL_RE = re.compile(r"[+＋]\s*(\d{1,2})")
 ECHO_SELECTED_COST_RE = re.compile(r"^[134]$")
 ECHO_SONATA_HEADER_BOX = (0.07, 0.03, 0.33, 0.17)
 ECHO_SONATA_OPTION_BOX = (0.13, 0.18, 0.31, 0.86)
 ECHO_INVENTORY_SORT_BUTTON = (0.205, 0.925)
+# The local scanner uses the character's three-column Echo inventory; its
+# arrow is left of the ordinary bag's upstream (0.35, 0.917) control.
+ECHO_INVENTORY_SORT_DIRECTION = (0.300, 0.925)
 ECHO_INVENTORY_SORT_LABEL_BOX = (0.10, 0.86, 0.32, 0.99)
 
 
@@ -635,6 +640,15 @@ class EnhanceEchoTask(BaseWWTask, FindFeature):
              if (match := ECHO_SELECTED_LEVEL_RE.search(token.name))),
             None,
         )
+        if observed_level is None:
+            # The small +0 beside the name can disappear in broad identity
+            # OCR. Re-read narrow crops of this same frame before rejecting
+            # the stack; never infer level from its quantity or main stat.
+            observed_level = self._read_selected_echo_level(frame=frame)
+            if observed_level is not None:
+                identity = tuple(identity) + (
+                    Box(0, 0, 0, 0, name=f'+{observed_level}'),
+                )
         if cost is None:
             for x, y, to_x, to_y in (
                 (0.80, 0.18, 0.87, 0.25),
@@ -685,9 +699,10 @@ class EnhanceEchoTask(BaseWWTask, FindFeature):
             canonical_name=name_match.canonical,
         )
 
-    def _read_selected_echo_level(self) -> int | None:
-        self.next_frame()
-        frame = self.frame
+    def _read_selected_echo_level(self, *, frame=None) -> int | None:
+        if frame is None:
+            self.next_frame()
+            frame = self.frame
         y_offset = self._echo_inventory_capture_y_offset(frame)
         # The compact 1366px layout places the level beside the name; the
         # 1920px inventory layout places it below COST. Narrow crops make the
@@ -1018,7 +1033,7 @@ class EnhanceEchoTask(BaseWWTask, FindFeature):
             # enhanced Echo. Toggle twice to reset the viewport while keeping
             # the user's sort direction, then apply the existing model filters.
             for _ in range(2):
-                self.click_relative(0.35, 0.917, after_sleep=settle_time)
+                self.click_relative(*ECHO_INVENTORY_SORT_DIRECTION, after_sleep=settle_time)
             self.info_set('候选搜索起点', '切换两次升降序并回到顶部')
 
             observed_identities: set[tuple[str, int, str]] = set()

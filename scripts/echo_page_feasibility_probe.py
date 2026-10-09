@@ -89,6 +89,11 @@ def parse_args() -> argparse.Namespace:
         help="comma-separated COST tabs used by the inventory sequence",
     )
     parser.add_argument("--max-pages", type=int, default=20)
+    parser.add_argument("--candidate-repeats", type=int, default=1)
+    parser.add_argument(
+        "--candidate-reset-scroll", type=int, default=0,
+        help="scroll down between read-only candidate searches to test viewport reset",
+    )
     parser.add_argument(
         "--include-incomplete",
         action="store_true",
@@ -185,6 +190,8 @@ def capture(task, output: Path, label: str) -> dict:
 
 def main() -> int:
     args = parse_args()
+    if args.candidate_repeats < 1 or args.candidate_reset_scroll < 0:
+        raise ValueError("candidate repeats must be positive and reset scroll non-negative")
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     output = args.output or Path("artifacts/echo_page_feasibility") / timestamp
     output.mkdir(parents=True, exist_ok=True)
@@ -219,6 +226,7 @@ def main() -> int:
         records = [capture(task, output, f"{args.label}_before")]
         scan_result = None
         candidate_inspection = None
+        repeated_candidates = []
         sonata_diagnostic = None
         if args.sequence == "equipped":
             for zone in (
@@ -361,8 +369,22 @@ def main() -> int:
                 ),
                 config=reviewed.policy,
             ))
-            level = task._select_first_fresh_echo(settle_time=args.settle)
-            identity = task._selected_model_candidate_identity
+            for repeat_index in range(args.candidate_repeats):
+                if repeat_index and args.candidate_reset_scroll:
+                    task.scroll_relative(0.25, 0.70, -args.candidate_reset_scroll)
+                    task.sleep(args.settle)
+                    records.append(capture(task, output, f"{args.label}_scrolled_{repeat_index}"))
+                level = task._select_first_fresh_echo(settle_time=args.settle)
+                identity = task._selected_model_candidate_identity
+                repeated_candidates.append({
+                    "level": level,
+                    "name": identity.name if identity else None,
+                    "cost": identity.cost if identity else None,
+                    "compatibility": identity.compatibility if identity else None,
+                    "search_start": task.info_get("候选搜索起点"),
+                })
+                if args.candidate_repeats > 1:
+                    records.append(capture(task, output, f"{args.label}_repeat_{repeat_index}"))
             candidate_inspection = {
                 "sonata_set": selected_set,
                 "target_cost": int(best["cost"]),
@@ -447,6 +469,7 @@ def main() -> int:
             "records": records,
             "inventory_scan": scan_result.to_dict() if scan_result else None,
             "candidate_inspection": candidate_inspection,
+            "repeated_candidates": repeated_candidates,
             "sonata_diagnostic": sonata_diagnostic,
             "check_result": (
                 check_result.to_dict() if args.sequence == "check" else None

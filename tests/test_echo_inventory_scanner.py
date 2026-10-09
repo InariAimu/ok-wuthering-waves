@@ -19,6 +19,7 @@ from src.task.EnhanceEchoTask import (
     ECHO_INVENTORY_COST_TABS,
     ECHO_INVENTORY_GRID_COLUMNS,
     ECHO_INVENTORY_GRID_ROWS,
+    ECHO_INVENTORY_SORT_DIRECTION,
     EnhanceEchoTask,
 )
 
@@ -101,6 +102,30 @@ class FakeInventoryScanner:
 
 
 class TestEchoInventoryScanner(unittest.TestCase):
+    def test_card_stack_quantity_is_not_an_enhancement_level(self):
+        class CardReader:
+            _read_echo_card_level = EnhanceEchoTask._read_echo_card_level
+            _echo_inventory_capture_y_offset = staticmethod(
+                EnhanceEchoTask._echo_inventory_capture_y_offset
+            )
+            frame = np.zeros((768, 1366, 3), dtype=np.uint8)
+
+            def next_frame(self):
+                pass
+
+            def ocr(self, *args, **kwargs):
+                return [Box(0, 0, 30, 12, name=self.text)]
+
+        reader = CardReader()
+        for text, expected in (
+            ('2', None), ('5', None), ('25', None), ('×2', None),
+            ('x25', None), ('99', None), ('+0', 0), ('+25', 25),
+            ('＋ 20', 20), ('+125', None),
+        ):
+            with self.subTest(text=text):
+                reader.text = text
+                self.assertEqual(reader._read_echo_card_level(0, 0), expected)
+
     def test_detects_optional_capture_title_bar_offset(self):
         client_frame = np.full((100, 160, 3), 40, dtype=np.uint8)
         titled_frame = client_frame.copy()
@@ -359,7 +384,7 @@ class TestEchoInventoryScanner(unittest.TestCase):
         self.assertEqual(level, 0)
         self.assertEqual(
             selector.clicks,
-            [(0.35, 0.917, 0), (0.35, 0.917, 0),
+            [(*ECHO_INVENTORY_SORT_DIRECTION, 0), (*ECHO_INVENTORY_SORT_DIRECTION, 0),
              (ECHO_INVENTORY_GRID_COLUMNS[1], ECHO_INVENTORY_GRID_ROWS[0], 0)],
         )
         self.assertEqual(selector.info["当前声骸等级"], 0)
@@ -589,7 +614,7 @@ class TestEchoInventoryScanner(unittest.TestCase):
 
             def click_relative(self, x, y, after_sleep=0):
                 self.clicks.append((x, y))
-                if (x, y) == (0.35, 0.917):
+                if (x, y) == ECHO_INVENTORY_SORT_DIRECTION:
                     self.sort_ascending = not self.sort_ascending
                     self.at_enhanced_echo = False
 
@@ -617,7 +642,7 @@ class TestEchoInventoryScanner(unittest.TestCase):
         self.assertEqual(selector._select_first_fresh_echo(settle_time=0), 0)
 
         self.assertEqual(selector.clicks.count(ECHO_INVENTORY_COST_TABS[1]), 1)
-        self.assertEqual(selector.clicks.count((0.35, 0.917)), 4)
+        self.assertEqual(selector.clicks.count(ECHO_INVENTORY_SORT_DIRECTION), 4)
         self.assertTrue(selector.sort_ascending)
         self.assertEqual(selector._selected_model_candidate_identity, eligible)
         self.assertEqual(

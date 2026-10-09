@@ -37,6 +37,10 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--output", type=Path)
     parser.add_argument("--settle", type=float, default=1.5)
     parser.add_argument(
+        "--verify-next-candidate", action="store_true",
+        help="after the bounded run, only select/read the next +0 candidate without enhancing it",
+    )
+    parser.add_argument(
         "--recover-discard-current",
         action="store_true",
         help="mark the currently open failed candidate discarded and return",
@@ -103,6 +107,7 @@ def main() -> int:
     task = None
     logs: list[dict[str, str]] = []
     error = None
+    post_run_candidate = None
     started_at = datetime.now().astimezone().isoformat()
     try:
         runtime.start_runtime()
@@ -175,6 +180,20 @@ def main() -> int:
             task.mark_discarded_and_esc()
         else:
             task.run()
+            if args.verify_next_candidate:
+                frame = task.executor.method.get_frame()
+                if frame is not None:
+                    save_webp(output / "enhanced_state.webp", frame)
+                level = task._select_first_fresh_echo(settle_time=args.settle)
+                identity = task._selected_model_candidate_identity
+                post_run_candidate = {
+                    "level": level,
+                    "name": identity.name if identity else None,
+                    "cost": identity.cost if identity else None,
+                    "compatibility": identity.compatibility if identity else None,
+                    "enhance_button_found": bool(task.find_echo_enhance()),
+                    "enhancement_attempted": False,
+                }
     except Exception as caught:
         error = {
             "type": type(caught).__name__,
@@ -206,6 +225,7 @@ def main() -> int:
                 "echo_exp": args.echo_exp,
             },
             "completed": error is None,
+            "post_run_candidate": post_run_candidate,
             "task_info": json_safe(task.info if task is not None else {}),
             "logs": logs,
             "error": error,
