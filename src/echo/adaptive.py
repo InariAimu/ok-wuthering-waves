@@ -191,6 +191,15 @@ class AdaptiveEnhancementSession(EchoEnhancementSession):
             if not self.inventory.compatible(identity):
                 return
             self._campaign.candidate_pool += (identity,)
+        # A later unreadable quantity must not erase a verified count that
+        # already accounts for this session's first reveals. A newly read
+        # numeric count remains authoritative; zero/unknown are not carried
+        # into a newly observed available stack.
+        previous_count = self.remaining.get(identity)
+        if (count is None and confirmed_available and previous_count is not None
+                and previous_count > 0):
+            count = previous_count
+            evidence += '; retained verified quantity minus reconciled first reveals'
         self._set_stock(identity, count, evidence)
         if count is None and confirmed_available:
             self.stock_status[identity] = 'present'

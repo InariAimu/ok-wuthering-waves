@@ -10,8 +10,8 @@ from src.echo.name_catalog import (
 
 class TestEchoNameCatalog(unittest.TestCase):
     def test_official_snapshot_is_unique_and_complete(self):
-        self.assertEqual(len(ECHO_NAMES_ZH_CN), 199)
-        self.assertEqual(len(set(ECHO_NAMES_ZH_CN)), 199)
+        self.assertEqual(len(ECHO_NAMES_ZH_CN), 204)
+        self.assertEqual(len(set(ECHO_NAMES_ZH_CN)), 204)
 
     def test_normalizes_width_spacing_and_middle_dot(self):
         match = match_echo_name(" 霁息兽尊・首 ")

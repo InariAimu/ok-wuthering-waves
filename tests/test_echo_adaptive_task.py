@@ -1,4 +1,6 @@
 import unittest
+from unittest.mock import PropertyMock, patch
+import numpy as np
 
 from src.echo.api import EchoResourceSnapshot, ResourceSource
 from src.echo.simulation import EchoState, EchoRoll, EchoStat
@@ -7,6 +9,48 @@ from tests.test_echo_adaptive import session_fixture, fake_rankings
 
 
 class TestAdaptiveLiveSearch(unittest.TestCase):
+    def test_unreadable_stack_retains_only_reconciled_current_session_count(self):
+        task = self.task()
+        session = task._echo_enhancement_session
+        identity = session.candidate_pool[0]
+        session.observe_stock(identity, 2, evidence='two matching quantity reads', confirmed_available=True)
+        session.begin_candidate(identity)
+        session.record_reveal(EchoState(), EchoState((EchoRoll.from_value(EchoStat.HP_PERCENT, 6.4),)))
+        session.record_discard(identity, session.active_state, 'test')
+        session.observe_stock(identity, None, evidence='quantity unreadable', confirmed_available=True)
+        self.assertEqual(session.remaining[identity], 1)
+        session.observe_stock(identity, 4, evidence='new numeric read', confirmed_available=True)
+        self.assertEqual(session.remaining[identity], 4)
+        session.observe_stock(identity, 0, evidence='verified exhausted')
+        session.observe_stock(identity, None, evidence='new available stack', confirmed_available=True)
+        self.assertIsNone(session.remaining[identity])
+    def test_scroll_detection_ignores_animation_between_cards(self):
+        task = self.task()
+        before = np.zeros((768, 1366, 3), dtype=np.uint8)
+        after = before.copy()
+        # The live 3C failure was caused by the animated scene between columns.
+        after[110:690, 234:248] = 180
+        task.next_frame = lambda: None
+        task.scroll_relative = lambda *args: None
+        task.sleep = lambda *args: None
+        with patch.object(ModelEnhanceEchoTask, 'frame', new_callable=PropertyMock,
+                          side_effect=(before, after)):
+            self.assertFalse(ModelEnhanceEchoTask._adaptive_scroll_changed(task, 5, 0))
+
+    def test_scroll_detection_preserves_card_level_changes(self):
+        task = self.task()
+        before = np.zeros((768, 1366, 3), dtype=np.uint8)
+        after = before.copy()
+        # A changed level/quantity label must remain evidence of movement,
+        # even when the Echo thumbnails above it happen to be identical.
+        after[190:204, 180:210] = 255
+        task.next_frame = lambda: None
+        task.scroll_relative = lambda *args: None
+        task.sleep = lambda *args: None
+        with patch.object(ModelEnhanceEchoTask, 'frame', new_callable=PropertyMock,
+                          side_effect=(before, after)):
+            self.assertTrue(ModelEnhanceEchoTask._adaptive_scroll_changed(task, 5, 0))
+
     def task(self):
         task = ModelEnhanceEchoTask.__new__(ModelEnhanceEchoTask)
         task._echo_enhancement_session = session_fixture()

@@ -360,8 +360,30 @@ class ModelEnhanceEchoTask(EnhanceEchoTask):
         self._manual_resource_ledger = None
         self._echo_enhancement_session = self._new_adaptive_session(
             self._loaded_inspection_result, self._resolve_resources())
+        for identity, evidence in getattr(self, '_verified_missing_stock', ()):
+            self._echo_enhancement_session.observe_stock(identity, 0, evidence=evidence)
         self._last_resource_sync_completed = 0
         self._publish_resources(self._echo_enhancement_session.ledger)
+
+    def configure_live_observations(self, *, missing_stock=(), search_settle_time=1.5):
+        """Use explicitly supplied current-run evidence, never old GUI stock.
+
+        Call before run(), after loading the inspection. Positive quantities
+        must still be read from the game; only verified missing identities
+        may bypass a redundant search.
+        """
+        import math
+        if not math.isfinite(search_settle_time) or search_settle_time < 0:
+            raise ValueError('search_settle_time must be finite and non-negative')
+        result = self._loaded_inspection_result
+        if result is None:
+            raise ValueError('load the current inspection before configuring live observations')
+        records = tuple(missing_stock)
+        if any(identity not in result.candidate_pool or not str(evidence).strip()
+               for identity, evidence in records):
+            raise ValueError('missing-stock evidence must identify a current candidate')
+        self._verified_missing_stock = records
+        self._live_search_settle_time = search_settle_time
 
     def _read_adaptive_stack_count(self, column, row):
         """A bare card number is quantity only after +0 detail validation."""
@@ -383,8 +405,18 @@ class ModelEnhanceEchoTask(EnhanceEchoTask):
         frame = self.frame
         offset = self._echo_inventory_capture_y_offset(frame)
         height, width = frame.shape[:2]
-        return frame[int((.14+offset)*height):int((.89+offset)*height),
-                     int(.11*width):int(.31*width)].copy()
+        # Inter-card gaps reveal the animated 3D scene. Comparing that scene
+        # made an inventory already at its end appear to scroll indefinitely.
+        # Keep card interiors, including their level/stack labels;
+        # omit gaps and the pulsing selection border. Ambiguous motion inside
+        # a card still remains inconclusive under the existing thresholds.
+        cards = [
+            frame[int((y-.105+offset)*height):int((y+.010+offset)*height),
+                  int((x-.025)*width):int((x+.025)*width)].reshape(-1, 3)
+            for y in ECHO_INVENTORY_LEVEL_ROWS
+            for x in ECHO_INVENTORY_GRID_COLUMNS
+        ]
+        return np.concatenate(cards, axis=0).copy()
 
     def _adaptive_scroll_changed(self, count, settle_time):
         before = self._adaptive_grid_frame()
@@ -400,6 +432,7 @@ class ModelEnhanceEchoTask(EnhanceEchoTask):
         return float(np.mean(difference)) >= .5 or float(np.percentile(difference, 99)) >= 8
 
     def _find_adaptive_fresh_echo(self, target, settle_time=.5):
+        settle_time = max(settle_time, getattr(self, '_live_search_settle_time', .5))
         session = self._echo_enhancement_session
         max_pages = max(1, int(self.config.get('Max Candidate Search Pages') or 10))
         scroll_count = max(1, int(self.config.get('Candidate Search Scroll Count') or 10))

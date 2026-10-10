@@ -2,6 +2,8 @@
 
 Source: https://wiki.kurobbs.com/mc/catalogue/list?fid=1099&sid=1107
 Snapshot: 2026-08-27 (199 entries)
+Additions: 2026-10-10, five Echoes needed by the Hsin template, checked at
+https://wuthering.gg/zh-Hans/characters/hsin
 """
 
 from __future__ import annotations
@@ -57,6 +59,7 @@ ECHO_NAMES_ZH_CN = (
     "留声奏者", "祖渊海触", "西莫斯先生", "贡多拉", "卫冕节使（公）",
     "章鱼先生", "拉里奥", "浴缸犬", "焙焙", "高天讯使", "弄臣",
     "墨丘利机", "颂诏节使", "流明灯使", "哈德良角斗士的肖像", "饰音歌姬",
+    "共鸣回响·天演溯心", "解形煞", "绝息魄", "玉冥蛇", "奇绽傀",
 )
 
 

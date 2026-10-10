@@ -741,9 +741,10 @@ class EnhanceEchoTask(BaseWWTask, FindFeature):
         y_offset = self._echo_inventory_capture_y_offset(frame)
         # The compact 1366px layout places the level beside the name; the
         # 1920px inventory layout places it below COST. Narrow crops make the
-        # small glyph large enough for OCR in both layouts.
+        # small glyph large enough for OCR in both layouts. Keep the compact
+        # crop above the glyph top: y=.145 clips part of '+25' at 1366x768.
         for x, y, to_x, to_y in (
-            (0.89, 0.145, 0.98, 0.215),
+            (0.89, 0.12, 0.98, 0.215),
             (0.89, 0.225, 0.98, 0.295),
         ):
             boxes = self.ocr(

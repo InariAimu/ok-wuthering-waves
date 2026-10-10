@@ -113,6 +113,199 @@
         "required_stats": [],
         "deferred_recycling": false
       }
+    },
+    "心": {
+      "sonata_set": "衔梦照世之心",
+      "profile_name": "hsin_ui_template",
+      "notes": "43311 配置。共鸣效率至少 120%，仅作硬性约束，不额外提高充能评分。基础共鸣效率固定按角色原始 100% 加五件声骸副词条计算，排除特定环境额外的 30%。候选种类为 4C 1 种、3C 2 种、1C 5 种，不代表胚子库存数量。GUI 主词条和权重会覆盖模板，切换角色后须同步下方配置。当前五件来自 2026-10-10 实机逐槽双次读回；实际强化前须重新核验。",
+      "substat_priority": [
+        ["crit_rate", "crit_damage"],
+        ["attack_percent"],
+        ["resonance_skill_damage"],
+        ["attack_flat"],
+        ["defense_percent", "hp_percent", "defense_flat", "hp_flat", "energy_regen", "basic_attack_damage", "heavy_attack_damage", "resonance_liberation_damage"]
+      ],
+      "main_stats": {
+        "4": "crit_damage",
+        "3": "electro_damage",
+        "1": "attack_percent"
+      },
+      "weights": {
+        "crit_rate": 1.8,
+        "crit_damage": 0.9,
+        "attack_percent": 0.9,
+        "defense_percent": 0.0,
+        "hp_percent": 0.0,
+        "attack_flat": 0.05,
+        "defense_flat": 0.0,
+        "hp_flat": 0.0,
+        "energy_regen": 0.0,
+        "basic_attack_damage": 0.0,
+        "heavy_attack_damage": 0.0,
+        "resonance_skill_damage": 0.6,
+        "resonance_liberation_damage": 0.0
+      },
+      "energy_policy": {
+        "required": 120.0,
+        "comfort": 120.0,
+        "overflow": 120.0,
+        "base": 100.0,
+        "tolerance_weight_ratio": 0.0
+      },
+      "base_panel": {"energy_regen": 100.0},
+      "equipped_echoes": [
+        {
+          "slot": "4C",
+          "name": "共鸣回响·天演溯心",
+          "cost": 4,
+          "rolls": [
+            {
+              "stat": "crit_rate",
+              "value": 9.3
+            },
+            {
+              "stat": "defense_flat",
+              "value": 50.0
+            },
+            {
+              "stat": "energy_regen",
+              "value": 9.2
+            },
+            {
+              "stat": "resonance_liberation_damage",
+              "value": 7.9
+            },
+            {
+              "stat": "hp_percent",
+              "value": 7.1
+            }
+          ]
+        },
+        {
+          "slot": "3C-1",
+          "name": "绝息魄",
+          "cost": 3,
+          "rolls": [
+            {
+              "stat": "energy_regen",
+              "value": 9.2
+            },
+            {
+              "stat": "attack_percent",
+              "value": 8.6
+            },
+            {
+              "stat": "hp_percent",
+              "value": 8.6
+            },
+            {
+              "stat": "resonance_skill_damage",
+              "value": 8.6
+            },
+            {
+              "stat": "hp_flat",
+              "value": 430.0
+            }
+          ]
+        },
+        {
+          "slot": "3C-2",
+          "name": "解形煞",
+          "cost": 3,
+          "rolls": [
+            {
+              "stat": "resonance_skill_damage",
+              "value": 8.6
+            },
+            {
+              "stat": "attack_percent",
+              "value": 6.4
+            },
+            {
+              "stat": "basic_attack_damage",
+              "value": 9.4
+            },
+            {
+              "stat": "crit_damage",
+              "value": 18.6
+            },
+            {
+              "stat": "crit_rate",
+              "value": 6.3
+            }
+          ]
+        },
+        {
+          "slot": "1C-1",
+          "name": "奇绽傀",
+          "cost": 1,
+          "rolls": [
+            {
+              "stat": "attack_percent",
+              "value": 8.6
+            },
+            {
+              "stat": "crit_rate",
+              "value": 6.3
+            },
+            {
+              "stat": "attack_flat",
+              "value": 30.0
+            },
+            {
+              "stat": "crit_damage",
+              "value": 15.0
+            },
+            {
+              "stat": "defense_percent",
+              "value": 12.8
+            }
+          ]
+        },
+        {
+          "slot": "1C-2",
+          "name": "玉冥蛇",
+          "cost": 1,
+          "rolls": [
+            {
+              "stat": "energy_regen",
+              "value": 7.6
+            },
+            {
+              "stat": "basic_attack_damage",
+              "value": 10.1
+            },
+            {
+              "stat": "hp_flat",
+              "value": 470.0
+            },
+            {
+              "stat": "attack_flat",
+              "value": 40.0
+            },
+            {
+              "stat": "defense_percent",
+              "value": 10.9
+            }
+          ]
+        }
+      ],
+      "candidate_names": {
+        "4": ["共鸣回响·天演溯心"],
+        "3": ["解形煞", "绝息魄"],
+        "1": ["心傀·喜", "霁息兽尊·首", "霁息兽尊·身", "玉冥蛇", "奇绽傀"]
+      },
+      "candidate_source": "https://wuthering.gg/zh-Hans/characters/hsin",
+      "policy": {
+        "rollout_samples": 2000,
+        "minimum_gain": 0.0,
+        "continuation_efficiency_ratio": 0.9,
+        "max_attempts": 2000,
+        "analysis_seed": 15100,
+        "outcome_seed": 151,
+        "required_stats": [],
+        "deferred_recycling": false
+      }
     }
   }
 }

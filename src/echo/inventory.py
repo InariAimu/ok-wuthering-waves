@@ -257,6 +257,24 @@ class EchoInventoryItem:
         }
 
 
+def inventory_item_from_dict(data: Mapping[str, object]) -> EchoInventoryItem:
+    """Restore an observed item without importing a UI task or game runtime."""
+    main_stats = []
+    for line in data['main_stats']:
+        try:
+            stat = EchoStat(str(line['stat']))
+        except ValueError:
+            stat = EchoMainStat(str(line['stat']))
+        main_stats.append(ObservedEchoStat(stat, float(line['value']),
+            str(line.get('label', '')), str(line.get('value_text', line['value']))))
+    return EchoInventoryItem(
+        EchoIdentity(str(data['name']), int(data['cost']), str(data['compatibility'])),
+        int(data['level']), tuple(main_stats),
+        EchoState(tuple(EchoRoll(EchoStat(str(roll['stat'])), int(roll['tier_index']))
+                        for roll in data['substats'])),
+        int(data['page_index']), int(data['cell_index']), str(data.get('screenshot', '')))
+
+
 def parse_echo_inventory_item(
         identity_tokens: Iterable[object],
         main_stat_tokens: Iterable[object],

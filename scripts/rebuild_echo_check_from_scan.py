@@ -14,49 +14,12 @@ if str(REPOSITORY_ROOT) not in sys.path:
 
 from src.echo.inventory import (
     EchoCharacterInventoryAnalysis,
-    EchoInventoryItem,
     EchoInventoryScanIssue,
     EchoInventoryScanResult,
-    EchoMainStat,
-    ObservedEchoStat,
+    inventory_item_from_dict as inventory_item,
 )
-from src.echo.optimizer import EchoIdentity
-from src.echo.simulation import EchoRoll, EchoState, EchoStat
 from src.echo.workflow import EchoInventoryCheckResult
 from src.task.CheckEchoInventoryTask import CheckEchoInventoryTask
-
-
-def observed_stat(data: dict) -> ObservedEchoStat:
-    value = str(data["stat"])
-    try:
-        stat = EchoStat(value)
-    except ValueError:
-        stat = EchoMainStat(value)
-    return ObservedEchoStat(
-        stat,
-        float(data["value"]),
-        str(data.get("label", "")),
-        str(data.get("value_text", data["value"])),
-    )
-
-
-def inventory_item(data: dict) -> EchoInventoryItem:
-    return EchoInventoryItem(
-        EchoIdentity(
-            str(data["name"]),
-            int(data["cost"]),
-            str(data["compatibility"]),
-        ),
-        int(data["level"]),
-        tuple(observed_stat(line) for line in data["main_stats"]),
-        EchoState(tuple(
-            EchoRoll(EchoStat(str(roll["stat"])), int(roll["tier_index"]))
-            for roll in data["substats"]
-        )),
-        int(data["page_index"]),
-        int(data["cell_index"]),
-        str(data.get("screenshot", "")),
-    )
 
 
 def rebuild(path: Path) -> EchoInventoryCheckResult:

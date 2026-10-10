@@ -32,6 +32,7 @@ from src.echo.api import EchoEnhancementSession, EchoResourceSnapshot
 from src.echo.optimizer import NamedEchoBuild, NamedEquippedEcho, EchoIdentity
 from src.echo.simulation import EchoState, EchoRoll, EchoStat
 from src.echo.workflow import EchoInventoryCheckResult, named_echo_build_to_dict, named_echo_build_from_dict
+from src.echo.live_workflow import capture_snapshot, read_equipped, write_json
 from src.task.EnhanceEchoTask import (
     ECHO_INVENTORY_COST_TABS, ECHO_INVENTORY_GRID_COLUMNS,
     ECHO_INVENTORY_GRID_ROWS, EnhanceEchoTask,
@@ -60,38 +61,9 @@ def json_safe(value):
     return str(value)
 
 
-def write_json(path: Path, data) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(json_safe(data), ensure_ascii=False, indent=2), encoding='utf-8')
-
-
 def screen(task, output: Path, label: str):
-    task.next_frame()
-    frame = task.frame.copy()
-    save_webp(output / f'{label}.webp', frame)
-    boxes = task.ocr(0, 0, 1, 1, frame=frame, threshold=0.1)
-    data = [{'text': box.name, 'x': box.x, 'y': box.y,
-             'width': box.width, 'height': box.height} for box in boxes]
-    write_json(output / f'{label}.json', data)
-    return data
-
-
-def read_equipped(task, output: Path):
-    items = []
-    for slot, cost, y in SLOTS:
-        task.click_relative(0.064, y, after_sleep=1.5)
-        item = task._read_selected_echo_inventory_item(
-            cost=cost, page_index=0, cell_index=0,
-            screenshot=str(output / f'equipped_{slot}.png'),
-        )
-        if item.level != 25 or item.state.slot_count != 5:
-            raise RuntimeError(f'{slot}: current equipment is not a fully read +25 Echo')
-        second = task._read_selected_echo_inventory_item(cost=cost, page_index=0, cell_index=0)
-        if item.attribute_key != second.attribute_key:
-            raise RuntimeError(f'{slot}: equipment details changed between reads')
-        items.append((slot, item))
-        write_json(output / 'equipped.json', [dict(item.to_dict(), slot=slot) for slot, item in items])
-    return items
+    # Compatibility wrapper for historical campaign reports.
+    return capture_snapshot(task, output, label, include_ocr=True)['ocr']
 
 
 def optimize_inventory(build, items):
