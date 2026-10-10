@@ -65,13 +65,13 @@ Python 命令使用仓库 `.venv`。需要查看或控制 Windows 界面时，�
 在 Windows 的 fresh checkout 根目录初始化模板子模块，并按仓库依赖准备 Python 3.12 环境：
 
 ```powershell
-git submodule update --init --recursive
+git -c core.longpaths=true submodule update --init --recursive
 py -3.12 -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -r requirements.txt
 .\.venv\Scripts\python.exe scripts/run_echo_workflow.py --help
 ```
 
-已有 `.venv` 时直接复用，不重复创建。运行代码、角色模板、测试和说明均由 Git 管理；`artifacts/`、`configs/` 和 `.venv/` 是本地数据，不能作为新环境的代码依赖。运行资产依赖初始化后的 `ok_templates` 子模块和项目运行库；OCR 等运行资源按项目正常初始化流程准备。没有游戏的环境可以查看 CLI 帮助并运行离线模型测试，不能据此声称实机捕获已验收。
+已有 `.venv` 时直接复用，不重复创建。`core.longpaths=true` 用于模板子模块中的长文件名，避免 Windows 深目录检出失败；也建议使用较短的仓库目录。运行代码、角色模板、测试和说明均由 Git 管理；`artifacts/`、`configs/` 和 `.venv/` 是本地数据，不能作为新环境的代码依赖。运行资产依赖初始化后的 `ok_templates` 子模块和项目运行库；OCR 等运行资源按项目正常初始化流程准备。没有游戏的环境可以查看 CLI 帮助并运行离线模型测试，不能据此声称实机捕获已验收。
 
 正式独立入口为 `scripts/run_echo_workflow.py`，公共实现为 `src/echo/live_workflow.py`。入口自动定位当前 checkout 根目录，使用本轮独立配置目录，关闭所有后台触发任务，启用运行库互斥检查，不连接已有 OK-WW 实例。启动前退出其他控制游戏的 OK-WW 进程；目标游戏必须已启动，并使用与游戏相匹配的权限。代码不内置管理员账户或本机绝对路径。
 
